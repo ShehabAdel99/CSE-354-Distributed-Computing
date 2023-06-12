@@ -5,7 +5,7 @@ import winsound
 
 # Create the main window
 root = tk.Tk()
-root.title("Chat Room")
+root.title("Chat Room for")
 
 # Create a frame to hold the chat messages
 messages_frame = tk.Frame(root)
