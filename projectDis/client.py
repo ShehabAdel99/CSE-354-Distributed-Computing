@@ -208,10 +208,14 @@ def main():
     bg_img = pygame.image.load(r"C:\Users\melsh\Desktop\gam3a\projectDis\img\White-broken-lines.png")
     scaled_image = pygame.transform.scale(bg_img, (360, 650))
     p = Player(50, 500, 49, 100, car_image2, scaled_image)
-    p2 = Player(200,500, 49, 100, car_image, scaled_image)
+    p2 = Player(0,0, 49, 100, car_image, scaled_image)
     clock=pygame.time.Clock()
     space_click=0
     ready1 = 0
+    xc = 0
+    yc = height_dis  // 2
+    vel_x = 1.5
+    vel_y = 0
     while run:
 
       clock.tick(100)
@@ -241,6 +245,23 @@ def main():
           if ready2==1:
            p.move(win)
            redrawWindow(win, p, p2)
+          else :
+              image3 = pygame.image.load(r"C:\Users\melsh\Desktop\gam3a\projectDis\img\a6rBl.png")
+              scaled_image = pygame.transform.scale(image3, (10, 15))
+              image_rect = scaled_image.get_rect()
+              font = pygame.font.SysFont("comicsansms", 20, True)
+              text1 = font.render("waiting for other player", True, (8,78, 91))
+              xc += vel_x
+              yc+= vel_y
+              if xc > width_dis:
+                  xc = -image_rect.width
+              #
+              win.fill((202, 228, 241))
+              win.blit(image3, (xc, yc))
+              win.blit(text1, (155 - text.get_width() // 2, 100 - text.get_height() // 3))
+              pygame.display.flip()
+
+
           for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 space_click=0
