@@ -3,7 +3,7 @@ from _thread import *
 import threading
 import sys
 
-# Define the server address and port
+# Define the server address and chat port
 host = '192.168.1.5'
 chat_port = 59000
 
@@ -38,7 +38,6 @@ def handle_client(client):
 
 # Function to receive client connections
 def receive():
-    while True:
         print('Server is running and listening ...')
         client, address = server.accept()
         print(f'connection is established with {str(address)}')
@@ -52,9 +51,8 @@ def receive():
         thread = threading.Thread(target=handle_client, args=(client,))
         thread.start()
 
-# Start the chat server
-    receive()
 
+# Define the game port
 game_port=5555
 
 s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
@@ -108,7 +106,11 @@ def threaded_client(conn,player):
 currentPlayer = 0
 
 while True:
- conn,addr=s.accept()
- print("Connected to:",addr)
- start_new_thread(threaded_client,(conn,currentPlayer))
- currentPlayer +=1
+    # Start the chat server
+    receive()
+
+    # Start the game srever
+    conn,addr=s.accept()
+    print("Connected to:",addr)
+    start_new_thread(threaded_client,(conn,currentPlayer))
+    currentPlayer +=1
