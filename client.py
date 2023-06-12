@@ -226,34 +226,31 @@ def main():
       for event in pygame.event.get():
         if event.type == pygame.QUIT:
              run = False
-             pygame.quit()
-        if event.type == pygame.MOUSEBUTTONDOWN:
-             break
 
-
+        menu_screen()
 
       p.move(win)
       redrawWindow(win, p, p2)
-main()
 
-# def menu_screen():
-#     run=False
-#     clock=pygame.time.Clock()
-#
-#     while run:
-#         clock.tick(60)
-#         win.fill((128, 128, 128))
-#         font=pygame.font.SysFont("comicsans",60)
-#         text=font.render("Click to plat!",1,(255,0,0))
-#         win.blit(text,(100,200))
-#         pygame.display.update()
-#         for event in pygame.event.get():
-#             if event.type == pygame.QUIT:
-#                 run = False
-#                 pygame.quit()
-#             if event.type == pygame.MOUSEBUTTONDOWN:
-#                 run = False
-#     main()
 
-# while True:
-#     menu_screen()
+def menu_screen():
+    run=False
+    clock=pygame.time.Clock()
+
+    while run:
+        clock.tick(60)
+        win.fill((128, 128, 128))
+        font=pygame.font.SysFont("comicsans",40)
+        text=font.render("Click to plat!",1,(255,0,0))
+        win.blit(text,(100,200))
+        pygame.display.update()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+                pygame.quit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                run = False
+    main()
+
+while True:
+    menu_screen()
