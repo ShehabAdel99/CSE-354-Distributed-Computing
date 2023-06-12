@@ -232,7 +232,7 @@ def main():
       p.move(win)
       redrawWindow(win, p, p2)
 
-
+# first window appears
 def menu_screen():
     run=False
     clock=pygame.time.Clock()
