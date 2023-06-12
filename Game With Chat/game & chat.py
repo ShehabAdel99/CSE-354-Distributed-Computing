@@ -377,10 +377,19 @@ def run_game():
     pass
 
 
-# Create a new thread for the chat box and start it
-chat_box_thread = threading.Thread(target=ChatBox, args=(root, "192.168.1.5", 59000))
-chat_box_thread.start()
 
+while True:
+    # Create a new thread for the chat box and start it
+    game_thread = threading.Thread(target=run_game())
+    game_thread.start()
+
+    chat_box_thread = threading.Thread(target=runChat())
+    chat_box_thread.start()
+
+
+
+"""""
 # Start the game loop
 run_game()
 root.mainloop()
+"""
