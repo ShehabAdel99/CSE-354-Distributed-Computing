@@ -210,42 +210,50 @@ def main():
     scaled_image = pygame.transform.scale(bg_img, (360, 650))
     p = Player(startPos[0], startPos[1], 49, 100, car_image2, scaled_image)
     p2 = Player(0, 0, 49, 100, car_image, scaled_image)
-
+    clock=pygame.time.Clock()
     while run:
       p2Pos = read_pos(n.send(make_pos((p.x, p.y, crash1))))
       p2.x = p2Pos[0]
       p2.y = p2Pos[1]
       crash2 = p2Pos[2]
-
-
       p2.update(win)
+      clock.tick(100)
+      win.fill((128, 128, 128))
+      font = pygame.font.SysFont("comicsans", 20)
+      text = font.render("Click to play!", 1, (255, 0, 0))
+      win.blit(text, (100, 200))
+      pygame.display.update()
       for event in pygame.event.get():
         if event.type == pygame.QUIT:
              run = False
              pygame.quit()
+        if event.type == pygame.MOUSEBUTTONDOWN:
+             break
+
+
 
       p.move(win)
       redrawWindow(win, p, p2)
+main()
 
-def menu_screen():
-    run=False
-    clock=pygame.time.Clock()
-    win.fill((128,128,128))
+# def menu_screen():
+#     run=False
+#     clock=pygame.time.Clock()
+#
+#     while run:
+#         clock.tick(60)
+#         win.fill((128, 128, 128))
+#         font=pygame.font.SysFont("comicsans",60)
+#         text=font.render("Click to plat!",1,(255,0,0))
+#         win.blit(text,(100,200))
+#         pygame.display.update()
+#         for event in pygame.event.get():
+#             if event.type == pygame.QUIT:
+#                 run = False
+#                 pygame.quit()
+#             if event.type == pygame.MOUSEBUTTONDOWN:
+#                 run = False
+#     main()
 
-    while run:
-        clock.tick(60)
-        win.fill((128, 128, 128))
-        font=pygame.font.SysFont("comicsans",60)
-        text=font.render("Click to plat!",1,(255,0,0))
-        win.blit(text,(100,200))
-        pygame.display.update()
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                run = False
-                pygame.quit()
-            if even.type == pygame.MOUSEBUTTONDOWN:
-                run = False
-    main()
-
-while True:
-    menu_screen()
+# while True:
+#     menu_screen()
