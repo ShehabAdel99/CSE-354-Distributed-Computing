@@ -35,7 +35,7 @@ class Player():
         self.bg_img_y2 = -600
         self.bg_img_speed = 0.7
         self.count = 0
-        self.enemy_car = pygame.image.load(r"E:\Semseter 8\Distributed Computing\Project\img\enemy_car_1.png")
+        self.enemy_car = pygame.image.load('.\\img\\enemy_car_1.png')
         self.enemy_car_startx = random.randrange(100, 360)
         self.enemy_car_starty = -600
         self.enemy_car_speed = 0.5
@@ -203,7 +203,6 @@ def main():
 
     run = True
     n = network()
-<<<<<<< HEAD
     car_image = r"C:\Users\melsh\Desktop\gam3a\projectDis\img\car.png"
     car_image2 = r"C:\Users\melsh\Desktop\gam3a\projectDis\img\enemy_car_2.png"
     bg_img = pygame.image.load(r"C:\Users\melsh\Desktop\gam3a\projectDis\img\White-broken-lines.png")
@@ -215,23 +214,6 @@ def main():
     ready1 = 0
     while run:
 
-=======
-    startPos = read_pos(n.getPos())
-    car_image = r"E:\Semseter 8\Distributed Computing\Project\img\car.png"
-    car_image2 = r"E:\Semseter 8\Distributed Computing\Project\img\enemy_car_2.png"
-    bg_img = pygame.image.load(r"E:\Semseter 8\Distributed Computing\Project\img\White-broken-lines.png")
-    scaled_image = pygame.transform.scale(bg_img, (360, 650))
-    p = Player(startPos[0], startPos[1], 49, 100, car_image2, scaled_image)
-    p2 = Player(0, 0, 49, 100, car_image, scaled_image)
-    clock=pygame.time.Clock()
-    space_click=0
-    while run:
-      # p2Pos = read_pos(n.send(make_pos((p.x, p.y, crash1))))
-      # p2.x = p2Pos[0]
-      # p2.y = p2Pos[1]
-      # crash2 = p2Pos[2]
-      # p2.update(win)
->>>>>>> 8813f642b295aac9b75f5e75d2a27d35beb95627
       clock.tick(100)
       win.fill((202, 228, 241))
       font = pygame.font.SysFont("comicsans", 20)
@@ -249,7 +231,6 @@ def main():
            if event.key == pygame.K_SPACE:
                space_click=1
       while space_click:
-<<<<<<< HEAD
           p2Pos = read_pos(n.send(make_pos((p.x, p.y, crash1, ready1))))
           p2.x = p2Pos[0]
           p2.y = p2Pos[1]
@@ -260,15 +241,6 @@ def main():
           if ready2==1:
            p.move(win)
            redrawWindow(win, p, p2)
-=======
-          p2Pos = read_pos(n.send(make_pos((p.x, p.y, crash1))))
-          p2.x = p2Pos[0]
-          p2.y = p2Pos[1]
-          crash2 = p2Pos[2]
-          p2.update(win)
-          p.move(win)
-          redrawWindow(win, p, p2)
->>>>>>> 8813f642b295aac9b75f5e75d2a27d35beb95627
           for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 space_click=0
