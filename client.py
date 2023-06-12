@@ -37,7 +37,7 @@ class Player():
         self.bg_img_y2 = -600
         self.bg_img_speed = 0.7
         self.count = 0
-        self.enemy_car = pygame.image.load(r"C:\Users\Dell\Desktop\Distributed project\img\WhatsApp Image 2023-06-11 at 2.29.02 AM.jpeg")
+        self.enemy_car = pygame.image.load(r"E:\Semseter 8\Distributed Computing\Project\img\enemy_car_1.png")
         self.enemy_car_startx = random.randrange(100, 360)
         self.enemy_car_starty = -600
         self.enemy_car_speed = 0.5
@@ -207,20 +207,20 @@ def main():
     run = True
     n = network()
     startPos = read_pos(n.getPos())
-    car_image = r"C:\Users\Dell\Desktop\Distributed project\img\WhatsApp Image 2023-06-11 at 2.29.02 AM (1).jpeg"
-    car_image2 = r"C:\Users\Dell\Desktop\Distributed project\img\WhatsApp Image 2023-06-11 at 2.29.03 AM (1).jpeg"
-    bg_img = pygame.image.load(r"C:\Users\Dell\Desktop\Distributed project\img\WhatsApp Image 2023-06-11 at 2.29.03 AM.jpeg")
+    car_image = r"E:\Semseter 8\Distributed Computing\Project\img\car.png"
+    car_image2 = r"E:\Semseter 8\Distributed Computing\Project\img\enemy_car_2.png"
+    bg_img = pygame.image.load(r"E:\Semseter 8\Distributed Computing\Project\img\White-broken-lines.png")
     scaled_image = pygame.transform.scale(bg_img, (360, 650))
     p = Player(startPos[0], startPos[1], 49, 100, car_image2, scaled_image)
     p2 = Player(0, 0, 49, 100, car_image, scaled_image)
     clock=pygame.time.Clock()
-    mouse_click=0
+    space_click=0
     while run:
-      p2Pos = read_pos(n.send(make_pos((p.x, p.y, crash1))))
-      p2.x = p2Pos[0]
-      p2.y = p2Pos[1]
-      crash2 = p2Pos[2]
-      p2.update(win)
+      # p2Pos = read_pos(n.send(make_pos((p.x, p.y, crash1))))
+      # p2.x = p2Pos[0]
+      # p2.y = p2Pos[1]
+      # crash2 = p2Pos[2]
+      # p2.update(win)
       clock.tick(100)
       win.fill((202, 228, 241))
       font = pygame.font.SysFont("comicsans", 20)
@@ -236,50 +236,22 @@ def main():
            if event.key == pygame.K_ESCAPE:
                  run = False
            if event.key == pygame.K_SPACE:
-               mouse_click=1
-      while mouse_click:
-        p.move(win)
-        redrawWindow(win, p, p2)
-        for event in pygame.event.get():
+               space_click=1
+      while space_click:
+          p2Pos = read_pos(n.send(make_pos((p.x, p.y, crash1))))
+          p2.x = p2Pos[0]
+          p2.y = p2Pos[1]
+          crash2 = p2Pos[2]
+          p2.update(win)
+          p.move(win)
+          redrawWindow(win, p, p2)
+          for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                mouse_click=0
+                space_click=0
                 run = False
 
-      #       if event.type == pygame.QUIT:
-      #          mouse_click=0
-      # if not mouse_click:
-      #     p.move(win)
-      #     redrawWindow(win, p, p2)
 
 
 
 
 main()
-        #menu_screen()
-
-      # p.move(win)
-      # redrawWindow(win, p, p2)
-
-
-# first window appears
-# def menu_screen():
-#     run=False
-#     clock=pygame.time.Clock()
-#
-#     while run:
-#         clock.tick(60)
-#         win.fill((128, 128, 128))
-#         font=pygame.font.SysFont("comicsans",40)
-#         text=font.render("Click to play!",1,(255,0,0))
-#         win.blit(text,(100,200))
-#         pygame.display.update()
-#         for event in pygame.event.get():
-#             if event.type == pygame.QUIT:
-#                 run = False
-#                 pygame.quit()
-#             if event.type == pygame.MOUSEBUTTONDOWN:
-#                 run = False
-#     main()
-#
-# while True:
-#     menu_screen()
