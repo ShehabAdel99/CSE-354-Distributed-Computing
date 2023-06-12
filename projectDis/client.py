@@ -2,7 +2,10 @@ import pygame
 from network import network
 import random
 from time import sleep
+from pygame.locals import *
 
+
+pygame.init()
 width_dis = 360
 height_dis = 650
 win = pygame.display.set_mode((width_dis, height_dis))
@@ -11,11 +14,9 @@ vel = 1
 clientNumber = 0
 crash1=0
 crash2=0
-ready1=0
-ready2=0
+
 class Player():
     def __init__(self, x, y, width, height, car_image, bg_image):
-        pygame.init()
         self.crashed = False
         self.white = (255, 255, 255)
         self.x = x
@@ -183,11 +184,11 @@ class Player():
 
 def read_pos(str):
     str=str.split(",")
-    return int(str[0]), int(str[1]), int(str[2])
+    return int(str[0]), int(str[1]), int(str[2]), int(str[3])
 
 
 def make_pos(tup):
-    return str(tup[0]) + "," + str(tup[1]) + "," + str(tup[2])
+    return str(tup[0]) + "," + str(tup[1]) + "," + str(tup[2])+ "," + str(tup[3])
 
 
 def redrawWindow(win, player, player2):
@@ -199,33 +200,53 @@ def redrawWindow(win, player, player2):
 def main():
     global crash2
     global crash1
-    global ready2
-    global ready1
+
     run = True
     n = network()
-    startPos = read_pos(n.getPos())
     car_image = r"C:\Users\melsh\Desktop\gam3a\projectDis\img\car.png"
     car_image2 = r"C:\Users\melsh\Desktop\gam3a\projectDis\img\enemy_car_2.png"
     bg_img = pygame.image.load(r"C:\Users\melsh\Desktop\gam3a\projectDis\img\White-broken-lines.png")
     scaled_image = pygame.transform.scale(bg_img, (360, 650))
-    p = Player(startPos[0], startPos[1], 49, 100, car_image2, scaled_image)
-    p2 = Player(0, 0, 49, 100, car_image, scaled_image)
-
+    p = Player(50, 500, 49, 100, car_image2, scaled_image)
+    p2 = Player(200,500, 49, 100, car_image, scaled_image)
+    clock=pygame.time.Clock()
+    space_click=0
+    ready1 = 0
     while run:
-      p2Pos = read_pos(n.send(make_pos((p.x, p.y, crash1))))
-      p2.x = p2Pos[0]
-      p2.y = p2Pos[1]
-      crash2 = p2Pos[2]
 
-
-      p2.update(win)
+      clock.tick(100)
+      win.fill((202, 228, 241))
+      font = pygame.font.SysFont("comicsans", 20)
+      text = font.render("Press Space to play!", 1, (58,78, 91))
+      text2= font.render("Press Escape to exit!", 1, (58,78, 91))
+      win.blit(text, (80, 200))
+      win.blit(text2, (80, 600))
+      pygame.display.update()
       for event in pygame.event.get():
         if event.type == pygame.QUIT:
              run = False
-             pygame.quit()
+        if event.type == pygame.KEYDOWN:
+           if event.key == pygame.K_ESCAPE:
+                 run = False
+           if event.key == pygame.K_SPACE:
+               space_click=1
+      while space_click:
+          p2Pos = read_pos(n.send(make_pos((p.x, p.y, crash1, ready1))))
+          p2.x = p2Pos[0]
+          p2.y = p2Pos[1]
+          crash2 = p2Pos[2]
+          ready2= p2Pos[3]
+          p2.update(win)
 
-      p.move(win)
-      redrawWindow(win, p, p2)
+          if ready2==1:
+           p.move(win)
+           redrawWindow(win, p, p2)
+          for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                space_click=0
+                run = False
+
+
 
 
 

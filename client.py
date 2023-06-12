@@ -37,7 +37,7 @@ class Player():
         self.bg_img_y2 = -600
         self.bg_img_speed = 0.7
         self.count = 0
-        self.enemy_car = pygame.image.load(r"E:\Semseter 8\Distributed Computing\Project\img\enemy_car_1.png")
+        self.enemy_car = pygame.image.load('.\\img\\enemy_car_1.png')
         self.enemy_car_startx = random.randrange(100, 360)
         self.enemy_car_starty = -600
         self.enemy_car_speed = 0.5
@@ -207,9 +207,10 @@ def main():
     run = True
     n = network()
     startPos = read_pos(n.getPos())
-    car_image = r"E:\Semseter 8\Distributed Computing\Project\img\car.png"
-    car_image2 = r"E:\Semseter 8\Distributed Computing\Project\img\enemy_car_2.png"
-    bg_img = pygame.image.load(r"E:\Semseter 8\Distributed Computing\Project\img\White-broken-lines.png")
+    startPos = read_pos(n.getPos())
+    car_image = r"C:\Users\melsh\Desktop\gam3a\projectDis\img\car.png"
+    car_image2 = r"C:\Users\melsh\Desktop\gam3a\projectDis\img\enemy_car_2.png"
+    bg_img = pygame.image.load(r"C:\Users\melsh\Desktop\gam3a\projectDis\img\White-broken-lines.png")
     scaled_image = pygame.transform.scale(bg_img, (360, 650))
     p = Player(startPos[0], startPos[1], 49, 100, car_image2, scaled_image)
     p2 = Player(0, 0, 49, 100, car_image, scaled_image)
