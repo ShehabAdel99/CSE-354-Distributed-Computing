@@ -140,6 +140,3 @@ def quit():
 # Start the GUI main loop
 root.mainloop()
 
-
-
-#fsvbero;dvshcbwr4;io;ehvgb
