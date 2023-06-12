@@ -222,10 +222,12 @@ def main():
       crash2 = p2Pos[2]
       p2.update(win)
       clock.tick(100)
-      win.fill((128, 128, 128))
+      win.fill((202, 228, 241))
       font = pygame.font.SysFont("comicsans", 20)
-      text = font.render("Click to play!", 1, (255, 0, 0))
-      win.blit(text, (100, 200))
+      text = font.render("Press Space to play!", 1, (58,78, 91))
+      text2= font.render("Press Escape to exit!", 1, (58,78, 91))
+      win.blit(text, (80, 200))
+      win.blit(text2, (80, 600))
       pygame.display.update()
       for event in pygame.event.get():
         if event.type == pygame.QUIT:
