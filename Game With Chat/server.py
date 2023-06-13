@@ -4,7 +4,7 @@ from _thread import *
 
 
 # Define the server address and port for the chat box server
-chat_box_host = '192.168.129.95'
+chat_box_host = '192.168.1.5'
 chat_box_port = 50000
 
 # Create a socket connection for the chat box server
@@ -54,7 +54,7 @@ def receive_chat_box():
 
 
 # Define the server address and port for the game server
-game_server_host = "192.168.129.95"
+game_server_host = "192.168.1.5"
 game_server_port = 5555
 
 game_server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
