@@ -8,29 +8,40 @@ import random
 from time import sleep
 from pygame.locals import *
 
-
-# Chat box code
+# Create the main window
 root = tk.Tk()
 root.title("Chat Room")
 
+# Create a frame to hold the chat messages
 messages_frame = tk.Frame(root)
 scrollbar = tk.Scrollbar(messages_frame)
 
+# This will contain the chat messages
 msg_list = tk.Listbox(messages_frame, height=15, width=50, yscrollcommand=scrollbar.set)
 
+# Set the chat bubble appearance
 msg_list.config(border=10, highlightthickness=10, relief=tk.FLAT, font=("Arial", 12), justify=tk.LEFT)
+
+# Set the background color and foreground color of the chat bubbles
 msg_list.config(bg="#f7f7f7", fg="#333333")
+
+# Set the color of the selection highlight
 msg_list.config(selectbackground="#b5d5ff", selectforeground="#333333")
 
 scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 msg_list.pack(side=tk.LEFT, fill=tk.BOTH)
 messages_frame.pack()
 
+# Create a frame to hold the entry field and send button
 entry_frame = tk.Frame(root)
 entry_field = tk.Entry(entry_frame)
+
+# Set the appearance of the entry field
 entry_field.config(border=8, highlightthickness=0, relief=tk.FLAT, font=("Arial", 12))
+
 entry_field.pack(side=tk.LEFT, expand=True, fill=tk.BOTH)
 
+# Function to handle sending messages from the client to the server
 def send(event=None):
     message = entry_field.get()
     entry_field.delete(0, tk.END)
@@ -39,25 +50,40 @@ def send(event=None):
         client_socket.close()
         root.quit()
 
+    # Play a revving engine sound effect
     winsound.PlaySound("car_sound.wav", winsound.SND_FILENAME)
 
+
+# Bind the send function to the Return key
 entry_field.bind("<Return>", send)
 
+# Create a button to send messages
 send_button = tk.Button(entry_frame, text="Send 🏎", command=send)
+
+# Set the appearance of the send button
 send_button.config(border=1, highlightthickness=5, relief=tk.FLAT, font=("Arial", 12), bg="#007bff", fg="#ffffff")
+
 send_button.pack(side=tk.RIGHT)
 
 entry_frame.pack()
 
+# Create a frame to hold the alias label and entry field
 alias_frame = tk.Frame(root)
 alias_label = tk.Label(alias_frame, text="Enter your Name:")
+
+# Set the appearance of the alias label
 alias_label.config(border=10, highlightthickness=0, relief=tk.FLAT,font=("Arial", 12), fg="#333333")
+
 alias_label.pack(side=tk.LEFT)
 alias_entry = tk.Entry(alias_frame)
+
+# Set the appearance of the alias entry field
 alias_entry.config(border=5, highlightthickness=0, relief=tk.FLAT, font=("Arial", 12))
+
 alias_entry.pack(side=tk.LEFT)
 alias_frame.pack()
 
+# Function to get the user's alias and connect to the server
 def connect():
     alias = alias_entry.get()
     if alias:
@@ -126,7 +152,7 @@ class Player():
         self.bg_img_y2 = -600
         self.bg_img_speed = 0.7
         self.count = 0
-        self.enemy_car = pygame.image.load(r"D:\Lectures\Senior-1\Semester 8\Distributed\pythonProject\projectDis\img\enemy_car_1.png")
+        self.enemy_car = pygame.image.load(r"C:\Users\YAS\Downloads\projectDis\img\enemy_car_1.png")
         self.enemy_car_startx = random.randrange(100, 360)
         self.enemy_car_starty = -600
         self.enemy_car_speed = 0.5
@@ -263,7 +289,6 @@ class Player():
             while pygame.event.peek(pygame.KEYUP):
                 pygame.event.wait()
 
-
 def read_pos(str):
     str=str.split(",")
     return int(str[0]), int(str[1]), int(str[2]), int(str[3])
@@ -279,15 +304,16 @@ def redrawWindow(win, player, player2):
     pygame.display.update()
 
 
+
 def main():
     global crash2
     global crash1
 
     run = True
     n = network()
-    car_image = r"D:\Lectures\Senior-1\Semester 8\Distributed\pythonProject\projectDis\img\car.png"
-    car_image2 = r"D:\Lectures\Senior-1\Semester 8\Distributed\pythonProject\projectDis\img\enemy_car_2.png"
-    bg_img = pygame.image.load(r"D:\Lectures\Senior-1\Semester 8\Distributed\pythonProject\projectDis\img\White-broken-lines.png")
+    car_image = r"C:\Users\YAS\Downloads\projectDis\img\car.png"
+    car_image2 = r"C:\Users\YAS\Downloads\projectDis\img\enemy_car_2.png"
+    bg_img = pygame.image.load(r"C:\Users\YAS\Downloads\projectDis\img\White-broken-lines.png")
     scaled_image = pygame.transform.scale(bg_img, (360, 650))
     p = Player(50, 500, 49, 100, car_image2, scaled_image)
     p2 = Player(0,0, 49, 100, car_image, scaled_image)
@@ -317,13 +343,12 @@ def main():
                 if event.key == pygame.K_SPACE:
                     space_click = 1
 
+
                 if event.key == pygame.K_c:
                     space_click = 0
                     connect()
                     receive_thread = threading.Thread(target=receive)
                     receive_thread.start()
-                    root.mainloop()
-
 
         while space_click:
             p2Pos = read_pos(n.send(make_pos((p.x, p.y, crash1, ready1))))
@@ -337,7 +362,7 @@ def main():
                 p.move(win)
                 redrawWindow(win, p, p2)
             else:
-                image3 = pygame.image.load(r"D:\Lectures\Senior-1\Semester 8\Distributed\pythonProject\projectDis\img\a6rBl.png")
+                image3 = pygame.image.load(r"C:\Users\YAS\Downloads\projectDis\img\a6rBl.png")
                 scaled_image = pygame.transform.scale(image3, (10, 15))
                 image_rect = scaled_image.get_rect()
                 font = pygame.font.SysFont("comicsansms", 20, True)
@@ -357,5 +382,6 @@ def main():
                     space_click = 0
                     run = False
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     main()
+root.mainloop()
