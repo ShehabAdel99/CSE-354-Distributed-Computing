@@ -41,6 +41,7 @@ entry_field.config(border=8, highlightthickness=0, relief=tk.FLAT, font=("Arial"
 
 entry_field.pack(side=tk.LEFT, expand=True, fill=tk.BOTH)
 
+
 # Function to handle sending messages from the client to the server
 def send(event=None):
     message = entry_field.get()
@@ -67,40 +68,11 @@ send_button.pack(side=tk.RIGHT)
 
 entry_frame.pack()
 
-# Create a frame to hold the alias label and entry field
-alias_frame = tk.Frame(root)
-alias_label = tk.Label(alias_frame, text="Enter your Name:")
+# Create a socket connection to the server
+global client_socket
 
-# Set the appearance of the alias label
-alias_label.config(border=10, highlightthickness=0, relief=tk.FLAT,font=("Arial", 12), fg="#333333")
 
-alias_label.pack(side=tk.LEFT)
-alias_entry = tk.Entry(alias_frame)
-
-# Set the appearance of the alias entry field
-alias_entry.config(border=5, highlightthickness=0, relief=tk.FLAT, font=("Arial", 12))
-
-alias_entry.pack(side=tk.LEFT)
-alias_frame.pack()
-
-# Function to get the user's alias and connect to the server
-def connect():
-    alias = alias_entry.get()
-    if alias:
-        global client_socket
-        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        client_socket.connect(('192.168.129.95', 50000))
-        client_socket.send(bytes(alias, "utf8"))
-
-        winsound.PlaySound("engine_sound.wav", winsound.SND_FILENAME)
-
-        alias_frame.pack_forget()
-        connect_button.pack_forget()
-
-        quit_button = tk.Button(root, text="Quit 🚪", command=quit)
-        quit_button.config(border=1, highlightthickness=5, relief=tk.FLAT, font=("Arial", 12), bg="#dc3545", fg="#ffffff")
-        quit_button.pack()
-
+# Function to handle receiving messages from the server and displaying them in the chat window
 def receive():
     while True:
         try:
@@ -112,14 +84,15 @@ def receive():
             root.quit()
             break
 
-def quit():
-    client_socket.send(bytes("{quit}", "utf8"))
-    client_socket.close()
-    root.quit()
 
-connect_button = tk.Button(root, text="Connect 🏁", command=connect)
-connect_button.config(border=1, highlightthickness=5, relief=tk.FLAT, font=("Arial", 12), bg="#007bff", fg="#ffffff")
-connect_button.pack()
+# def update_gui():
+#     root.update()
+#     root.after(1, wait())
+
+# def wait():
+#     for event in pygame.event.get():
+#          if event.key == pygame.K_DELETE:
+#             root.wait_window() # paaaaussseedd
 
 # Game code
 pygame.init()
@@ -129,8 +102,9 @@ win = pygame.display.set_mode((width_dis, height_dis))
 pygame.display.set_caption("Client")
 vel = 1
 clientNumber = 0
-crash1=0
-crash2=0
+crash1 = 0
+crash2 = 0
+
 
 class Player():
     def __init__(self, x, y, width, height, car_image, bg_image):
@@ -152,7 +126,8 @@ class Player():
         self.bg_img_y2 = -600
         self.bg_img_speed = 0.7
         self.count = 0
-        self.enemy_car = pygame.image.load(r"C:\Users\YAS\Downloads\projectDis\img\enemy_car_1.png")
+        self.enemy_car = pygame.image.load(
+            r"D:\Lectures\Senior-1\Semester 8\Distributed\pythonProject\projectDis\img\enemy_car_1.png")
         self.enemy_car_startx = random.randrange(100, 360)
         self.enemy_car_starty = -600
         self.enemy_car_speed = 0.5
@@ -289,13 +264,14 @@ class Player():
             while pygame.event.peek(pygame.KEYUP):
                 pygame.event.wait()
 
+
 def read_pos(str):
-    str=str.split(",")
+    str = str.split(",")
     return int(str[0]), int(str[1]), int(str[2]), int(str[3])
 
 
 def make_pos(tup):
-    return str(tup[0]) + "," + str(tup[1]) + "," + str(tup[2])+ "," + str(tup[3])
+    return str(tup[0]) + "," + str(tup[1]) + "," + str(tup[2]) + "," + str(tup[3])
 
 
 def redrawWindow(win, player, player2):
@@ -304,21 +280,20 @@ def redrawWindow(win, player, player2):
     pygame.display.update()
 
 
-
 def main():
     global crash2
     global crash1
 
     run = True
     n = network()
-    car_image = r"C:\Users\YAS\Downloads\projectDis\img\car.png"
-    car_image2 = r"C:\Users\YAS\Downloads\projectDis\img\enemy_car_2.png"
-    bg_img = pygame.image.load(r"C:\Users\YAS\Downloads\projectDis\img\White-broken-lines.png")
+    car_image = r"D:\Lectures\Senior-1\Semester 8\Distributed\pythonProject\projectDis\img\car.png"
+    car_image2 = r"D:\Lectures\Senior-1\Semester 8\Distributed\pythonProject\projectDis\img\enemy_car_2.png"
+    bg_img = pygame.image.load(r"D:\Lectures\Senior-1\Semester 8\Distributed\pythonProject\projectDis\img\White-broken-lines.png")
     scaled_image = pygame.transform.scale(bg_img, (360, 650))
     p = Player(50, 500, 49, 100, car_image2, scaled_image)
-    p2 = Player(0,0, 49, 100, car_image, scaled_image)
-    clock=pygame.time.Clock()
-    space_click=0
+    p2 = Player(0, 0, 49, 100, car_image, scaled_image)
+    clock = pygame.time.Clock()
+    space_click = 0
     ready1 = 0
     xc = 0
     yc = height_dis // 2
@@ -326,6 +301,7 @@ def main():
     vel_y = 0
 
     while run:
+        global client_socket
         clock.tick(100)
         win.fill((202, 228, 241))
         font = pygame.font.SysFont("comicsans", 20)
@@ -342,13 +318,20 @@ def main():
                     run = False
                 if event.key == pygame.K_SPACE:
                     space_click = 1
-
-
                 if event.key == pygame.K_c:
-                    space_click = 0
-                    connect()
+                    space_click = 1
+                    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    client_socket.connect(('192.168.1.5', 50000))
+                    # Create a thread to receive messages from the server
                     receive_thread = threading.Thread(target=receive)
                     receive_thread.start()
+
+                    # # Create a thread to run the update_gui() function
+                    # root_thread = threading.Thread(target=update_gui)
+                    # root_thread.start()
+
+                    root_thread = threading.Thread(target=root.mainloop())
+                    root_thread.start()
 
         while space_click:
             p2Pos = read_pos(n.send(make_pos((p.x, p.y, crash1, ready1))))
@@ -362,7 +345,8 @@ def main():
                 p.move(win)
                 redrawWindow(win, p, p2)
             else:
-                image3 = pygame.image.load(r"C:\Users\YAS\Downloads\projectDis\img\a6rBl.png")
+                image3 = pygame.image.load(
+                    r"D:\Lectures\Senior-1\Semester 8\Distributed\pythonProject\projectDis\img\a6rBl.png")
                 scaled_image = pygame.transform.scale(image3, (10, 15))
                 image_rect = scaled_image.get_rect()
                 font = pygame.font.SysFont("comicsansms", 20, True)
@@ -382,6 +366,6 @@ def main():
                     space_click = 0
                     run = False
 
+
 if __name__ == "__main__":
     main()
-root.mainloop()
