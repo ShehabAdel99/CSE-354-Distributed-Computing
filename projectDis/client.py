@@ -1,7 +1,10 @@
+import threading
+
 import pygame
 from network import network
 import random
 from time import sleep
+
 from pygame.locals import *
 
 
@@ -12,9 +15,11 @@ win = pygame.display.set_mode((width_dis, height_dis))
 pygame.display.set_caption("Client")
 vel = 1
 clientNumber = 0
+ready1 = 0
 crash1=0
 crash2=0
-
+run1=True
+lock =threading.Lock
 class Player():
     def __init__(self, x, y, width, height, car_image, bg_image):
         self.crashed = False
@@ -65,6 +70,7 @@ class Player():
 
     def move(self, win):
         global crash1
+        global ready1
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.crashed = True
@@ -83,7 +89,7 @@ class Player():
         if keys[pygame.K_DOWN]:
             self.y += self.vel
 
-        self.update(win)
+        self.update()
         self.back_ground_raod(win)
         self.run_enemy_car(self.enemy_car_startx, self.enemy_car_starty, win)
         self.enemy_car_starty += self.enemy_car_speed
@@ -117,6 +123,7 @@ class Player():
                 self.crashed = True
                 self.display_message("You lost!", win)
                 crash1 = 1
+                ready1=0
                 sleep(1)
                 self.x = 160
                 self.y = 550
@@ -128,28 +135,29 @@ class Player():
 
 
 
-        self.update(win)
+        self.update()
 
     def display_message(self, msg, win):
         font = pygame.font.SysFont("comicsansms", 30, True)
         text = font.render(msg, True, (255, 255, 255))
         win.blit(text, (200 - text.get_width() // 2, 150 - text.get_height() // 3))
         pygame.display.update()
+        pygame.time.delay(1000)
 
         # Pause the game until the player chooses to play again
         clock = pygame.time.Clock()
         clock.tick(60)
 
-        font = pygame.font.SysFont("comicsansms", 15, True)
-
-        # Display a message on the screen
-        text = font.render("Press Any key to continue", True, (255, 255, 255))
-        win.blit(text, (200- text.get_width() / 2, 400 - text.get_height() / 2))
-        pygame.display.update()
-        pygame.event.clear()
-        pygame.event.wait()
-        while pygame.event.peek(pygame.KEYUP):
-            pygame.event.wait()
+        # font = pygame.font.SysFont("comicsansms", 15, True)
+        #
+        # # Display a message on the screen
+        # # text = font.render("Press Any key to continue", True, (255, 255, 255))
+        # # win.blit(text, (200- text.get_width() / 2, 400 - text.get_height() / 2))
+        # # pygame.display.update()
+        # # pygame.event.clear()
+        # # pygame.event.wait()
+        # # while pygame.event.peek(pygame.KEYUP):
+        # #     pygame.event.wait()
 
 
 
@@ -158,28 +166,8 @@ class Player():
         text = font.render("Score : " + str(count), True, self.white)
         win.blit(text, (0, 0))
 
-    def update(self,win):
-        global crash2
-        global crash1
+    def update(self):
         self.rect = (self.x, self.y, self.width, self.height)
-        if crash2 == 1:
-          self.display_message("you win!!",win)
-          crash2=0
-          crash1=0
-          font = pygame.font.SysFont("comicsansms", 15, True)
-
-          # Display a message on the screen
-          text = font.render("Press Any key to continue", True, (255, 255, 255))
-          win.blit(text, (200- text.get_width() / 2, 400 - text.get_height() / 2))
-          pygame.display.update()
-          pygame.event.clear()
-          pygame.event.wait()
-          while pygame.event.peek(pygame.KEYUP):
-              pygame.event.wait()
-
-
-
-
 
 
 def read_pos(str):
@@ -200,8 +188,10 @@ def redrawWindow(win, player, player2):
 def main():
     global crash2
     global crash1
+    global run1
+    global ready1
 
-    run = True
+
     n = network()
     car_image = r"C:\Users\melsh\Desktop\gam3a\projectDis\img\car.png"
     car_image2 = r"C:\Users\melsh\Desktop\gam3a\projectDis\img\enemy_car_2.png"
@@ -211,12 +201,12 @@ def main():
     p2 = Player(0,0, 49, 100, car_image, scaled_image)
     clock=pygame.time.Clock()
     space_click=0
-    ready1 = 0
     xc = 0
     yc = height_dis  // 2
     vel_x = 1.5
     vel_y = 0
-    while run:
+    pressed_key2=0
+    while run1:
 
       clock.tick(100)
       win.fill((202, 228, 241))
@@ -228,10 +218,10 @@ def main():
       pygame.display.update()
       for event in pygame.event.get():
         if event.type == pygame.QUIT:
-             run = False
+             run1 = False
         if event.type == pygame.KEYDOWN:
            if event.key == pygame.K_ESCAPE:
-                 run = False
+                 run1 = False
            if event.key == pygame.K_SPACE:
                space_click=1
       while space_click:
@@ -240,12 +230,9 @@ def main():
           p2.y = p2Pos[1]
           crash2 = p2Pos[2]
           ready2= p2Pos[3]
-          p2.update(win)
+          p2.update()
 
-          if ready2==1:
-           p.move(win)
-           redrawWindow(win, p, p2)
-          else :
+          if ready2==0 and crash2==0 :
               image3 = pygame.image.load(r"C:\Users\melsh\Desktop\gam3a\projectDis\img\a6rBl.png")
               scaled_image = pygame.transform.scale(image3, (10, 15))
               image_rect = scaled_image.get_rect()
@@ -255,17 +242,64 @@ def main():
               yc+= vel_y
               if xc > width_dis:
                   xc = -image_rect.width
-              #
+
               win.fill((202, 228, 241))
               win.blit(image3, (xc, yc))
               win.blit(text1, (155 - text.get_width() // 2, 100 - text.get_height() // 3))
               pygame.display.flip()
+          elif ready2==1 and crash2==1:
+                p.display_message("you win!!", win)
+                win.fill((202, 228, 241))
+                font = pygame.font.SysFont("comicsans", 20)
+                text = font.render("Press Space to play again!", 1, (58, 78, 91))
+                text2 = font.render("Press Escape to exit!", 1, (58, 78, 91))
+                win.blit(text, (80, 200))
+                win.blit(text2, (80, 600))
+                pygame.display.update()
+                while pressed_key2==0 :
+                 for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        run1 = False
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_ESCAPE:
+                            run1 = False
+                        if event.key == pygame.K_SPACE:
+                            pressed_key2=1
+                            ready1=0
+                            space_click = False
+          elif ready2==1 and crash1==1:
+              win.fill((202, 228, 241))
+              font = pygame.font.SysFont("comicsans", 20)
+              text = font.render("Press Space to play again!", 1, (58, 78, 91))
+              text2 = font.render("Press Escape to exit!", 1, (58, 78, 91))
+              win.blit(text, (80, 200))
+              win.blit(text2, (80, 600))
+              pygame.display.update()
+              while pressed_key2 == 0:
+                  for event in pygame.event.get():
+                      if event.type == pygame.QUIT:
+                          run1 = False
+                      if event.type == pygame.KEYDOWN:
+                          if event.key == pygame.K_ESCAPE:
+                              run1 = False
+                          if event.key == pygame.K_SPACE:
+
+                                  crash1 = 0
+                                  pressed_key2 = 1
+                                  ready1=0
+                                  space_click= False
+          elif ready2 == 1 and crash2 == 0:
+            p.move(win)
+            redrawWindow(win, p, p2)
+
+
+
 
 
           for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 space_click=0
-                run = False
+                run1 = False
 
 
 
