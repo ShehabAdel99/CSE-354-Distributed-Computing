@@ -23,6 +23,8 @@ except socket.error as e:
 s.listen(2)
 print("Waiting for a connection")
 
+
+
 def threaded_client(conn,player):
     conn.send(str.encode(make_pos(pos[player])))
     reply=""
@@ -37,15 +39,22 @@ def threaded_client(conn,player):
                 print("Disconnected")
                 break
             else:
-                if player ==1:
+                if player ==1 and pos[0][2]==1:
+                    # pos[0] = (*pos[0][:3], 0)
+                    pos[1] = (*pos[1][:3], 0)
+                    reply = pos[0]
+                elif player ==0 and pos[1][2]==1:
+                    pos[0] = (*pos[0][:3], 0)
+                    # pos[1] = (*pos[1][:3], 0)
+                    reply = pos[1]
+                elif player ==1:
                     pos[1] = (*pos[1][:3], 1)
                     reply = pos[0]
-
-
-
                 else:
                     pos[0] = (*pos[0][:3], 1)
                     reply = pos[1]
+
+
 
                 print("Received :",reply)
                 print("Sending :", reply)
