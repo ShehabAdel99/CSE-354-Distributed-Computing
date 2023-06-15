@@ -8,83 +8,7 @@ import random
 from time import sleep
 from pygame.locals import *
 
-# Create the main window
-root = tk.Tk()
-root.title("Chat Room")
-
-# Create a frame to hold the chat messages
-messages_frame = tk.Frame(root)
-scrollbar = tk.Scrollbar(messages_frame)
-
-# This will contain the chat messages
-msg_list = tk.Listbox(messages_frame, height=15, width=50, yscrollcommand=scrollbar.set)
-
-# Set the chat bubble appearance
-msg_list.config(border=10, highlightthickness=10, relief=tk.FLAT, font=("Arial", 12), justify=tk.LEFT)
-
-# Set the background color and foreground color of the chat bubbles
-msg_list.config(bg="#f7f7f7", fg="#333333")
-
-# Set the color of the selection highlight
-msg_list.config(selectbackground="#b5d5ff", selectforeground="#333333")
-
-scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-msg_list.pack(side=tk.LEFT, fill=tk.BOTH)
-messages_frame.pack()
-
-# Create a frame to hold the entry field and send button
-entry_frame = tk.Frame(root)
-entry_field = tk.Entry(entry_frame)
-
-# Set the appearance of the entry field
-entry_field.config(border=8, highlightthickness=0, relief=tk.FLAT, font=("Arial", 12))
-
-entry_field.pack(side=tk.LEFT, expand=True, fill=tk.BOTH)
-
-
-# Function to handle sending messages from the client to the server
-def send(event=None):
-    message = entry_field.get()
-    entry_field.delete(0, tk.END)
-    client_socket.send(bytes(message, "utf8"))
-    if message == "{quit}":
-        client_socket.close()
-        root.quit()
-
-    # Play a revving engine sound effect
-    winsound.PlaySound("car_sound.wav", winsound.SND_FILENAME)
-
-
-# Bind the send function to the Return key
-entry_field.bind("<Return>", send)
-
-# Create a button to send messages
-send_button = tk.Button(entry_frame, text="Send 🏎", command=send)
-
-# Set the appearance of the send button
-send_button.config(border=1, highlightthickness=5, relief=tk.FLAT, font=("Arial", 12), bg="#007bff", fg="#ffffff")
-
-send_button.pack(side=tk.RIGHT)
-
-entry_frame.pack()
-
-# Create a socket connection to the server
 global client_socket
-
-
-# Function to handle receiving messages from the server and displaying them in the chat window
-def receive():
-    while True:
-        try:
-            message = client_socket.recv(1024).decode('utf-8')
-            msg_list.insert(tk.END, message)
-        except:
-            print('Error!')
-            client_socket.close()
-            root.quit()
-            break
-
-
 # def update_gui():
 #     root.update()
 #     root.after(1, wait())
@@ -279,10 +203,93 @@ def redrawWindow(win, player, player2):
     player2.draw(win)
     pygame.display.update()
 
+def chat_window():
+    # Create the main window
+    root = tk.Tk()
+    root.title("Chat Room")
+
+    # Create a frame to hold the chat messages
+    messages_frame = tk.Frame(root)
+    scrollbar = tk.Scrollbar(messages_frame)
+
+    # This will contain the chat messages
+    msg_list = tk.Listbox(messages_frame, height=15, width=50, yscrollcommand=scrollbar.set)
+
+    # Set the chat bubble appearance
+    msg_list.config(border=10, highlightthickness=10, relief=tk.FLAT, font=("Arial", 12), justify=tk.LEFT)
+
+    # Set the background color and foreground color of the chat bubbles
+    msg_list.config(bg="#f7f7f7", fg="#333333")
+
+    # Set the color of the selection highlight
+    msg_list.config(selectbackground="#b5d5ff", selectforeground="#333333")
+
+    scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+    msg_list.pack(side=tk.LEFT, fill=tk.BOTH)
+    messages_frame.pack()
+
+    # Create a frame to hold the entry field and send button
+    entry_frame = tk.Frame(root)
+    entry_field = tk.Entry(entry_frame)
+
+    # Set the appearance of the entry field
+    entry_field.config(border=8, highlightthickness=0, relief=tk.FLAT, font=("Arial", 12))
+
+    entry_field.pack(side=tk.LEFT, expand=True, fill=tk.BOTH)
+
+    # Function to handle sending messages from the client to the server
+    def send(event=None):
+        message = entry_field.get()
+        entry_field.delete(0, tk.END)
+        client_socket.send(bytes(message, "utf8"))
+        if message == "{quit}":
+            client_socket.close()
+            root.quit()
+
+        # Play a revving engine sound effect
+        winsound.PlaySound("car_sound.wav", winsound.SND_FILENAME)
+
+    # Bind the send function to the Return key
+    entry_field.bind("<Return>", send)
+
+    # Create a button to send messages
+    send_button = tk.Button(entry_frame, text="Send 🏎", command=send)
+
+    # Set the appearance of the send button
+    send_button.config(border=1, highlightthickness=5, relief=tk.FLAT, font=("Arial", 12), bg="#007bff", fg="#ffffff")
+
+    send_button.pack(side=tk.RIGHT)
+
+    entry_frame.pack()
+
+    # Create a socket connection to the server
+    global client_socket
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_socket.connect(('192.168.1.74', 50000))
+
+    # Function to handle receiving messages from the server and displaying them in the chat window
+    def receive():
+        while True:
+            try:
+                message = client_socket.recv(1024).decode('utf-8')
+                msg_list.insert(tk.END, message)
+            except:
+                print('Error!')
+                client_socket.close()
+                root.quit()
+                break
+
+    # Create a thread to receive messages from the server
+    receive_thread = threading.Thread(target=receive)
+    receive_thread.start()
+
+    # Start the chat window mainloop
+    root.mainloop()
 
 def main():
     global crash2
     global crash1
+
 
     run = True
     n = network()
@@ -319,19 +326,19 @@ def main():
                 if event.key == pygame.K_SPACE:
                     space_click = 1
                 if event.key == pygame.K_c:
-                    space_click = 1
-                    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    client_socket.connect(('192.168.1.5', 50000))
-                    # Create a thread to receive messages from the server
-                    receive_thread = threading.Thread(target=receive)
-                    receive_thread.start()
+                    #space_click = 1
+                    # client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    # client_socket.connect(('192.168.1.74', 50000))
+                    # Start the chat window thread
+                    chat_thread = threading.Thread(target=chat_window)
+                    chat_thread.start()
 
                     # # Create a thread to run the update_gui() function
                     # root_thread = threading.Thread(target=update_gui)
                     # root_thread.start()
 
-                    root_thread = threading.Thread(target=root.mainloop())
-                    root_thread.start()
+                    # root_thread = threading.Thread(target=root.mainloop())
+                    # root_thread.start()
 
         while space_click:
             p2Pos = read_pos(n.send(make_pos((p.x, p.y, crash1, ready1))))
@@ -365,7 +372,6 @@ def main():
                 if event.type == pygame.QUIT:
                     space_click = 0
                     run = False
-
 
 if __name__ == "__main__":
     main()
