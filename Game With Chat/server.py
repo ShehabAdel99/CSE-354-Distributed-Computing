@@ -4,7 +4,7 @@ from _thread import *
 
 
 # Define the server address and port for the chat box server
-chat_box_host = '192.168.1.5'
+chat_box_host = '192.168.1.74'
 chat_box_port = 50000
 
 # Create a socket connection for the chat box server
@@ -42,34 +42,22 @@ def receive_chat_box():
         print('Chat box server is running and listening ...')
         client, address = chat_box_server.accept()
         print(f'connection is established with {str(address)}')
-        client.send('alias?'.encode('utf-8'))
+        # client.send('alias?'.encode('utf-8'))
         alias = client.recv(1024).decode('utf-8')
         aliases.append(alias)
         clients.append(client)
         print(f'The alias of this client is {alias}'.encode('utf-8'))
-        broadcast(f'{alias} has connected to the chat room'.encode('utf-8'))
+        broadcast(f'{alias} has connected to the chat room. '.encode('utf-8'))
         client.send('you are now connected!'.encode('utf-8'))
         thread = threading.Thread(target=handle_client, args=(client,))
         thread.start()
 
 
 # Define the server address and port for the game server
-game_server_host = "192.168.1.5"
-game_server_port = 5555
+server="192.168.1.74"
+port=5555
 
-game_server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-game_server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-
-try:
-    game_server_socket.bind((game_server_host, game_server_port))
-except socket.error as e:
-    str(e)
-
-game_server_socket.listen(2)
-print("Waiting for a connection")
-
-
-# Functions to handle game server connections
+s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 def read_pos(str):
      str=str.split(",")
      return int(str[0]), int(str[1]), int(str[2]), int(str[3])
@@ -77,12 +65,21 @@ def read_pos(str):
 
 def make_pos(tup):
     return str(tup[0]) + "," + str(tup[1]) + "," + str(tup[2]) + "," + str(tup[3])
-
 pos=[(50,500,0,0),(200,500,0,0)]
+try:
+    s.bind((server,port))
+except socket.error as e:
+    str(e)
+
+s.listen(2)
+print("Waiting for a connection")
+
+
 
 def threaded_client(conn,player):
     conn.send(str.encode(make_pos(pos[player])))
     reply=""
+
 
     while True:
         try:
@@ -93,13 +90,21 @@ def threaded_client(conn,player):
                 print("Disconnected")
                 break
             else:
-                if player ==1:
+                if player ==1 and pos[0][2]==1:
+                    pos[1] = (*pos[1][:3], 0)
+                    reply = pos[0]
+                elif player ==0 and pos[1][2]==1:
+                    pos[0] = (*pos[0][:3], 0)
+                    reply = pos[1]
+
+                elif player ==1:
                     pos[1] = (*pos[1][:3], 1)
                     reply = pos[0]
-
                 else:
                     pos[0] = (*pos[0][:3], 1)
                     reply = pos[1]
+
+
 
                 print("Received :",reply)
                 print("Sending :", reply)
@@ -115,7 +120,7 @@ def threaded_client(conn,player):
 def receive_game_server():
     currentPlayer = 0
     while True:
-        conn,addr=game_server_socket.accept()
+        conn,addr=s.accept()
 
         print("Connected to:",addr)
         start_new_thread(threaded_client,(conn,currentPlayer))
