@@ -16,7 +16,7 @@ def chat_window():
     root.title("Race Chat")
 
     # Set the window icon
-    root.iconbitmap("race_icon.ico")
+    root.iconbitmap("racing-helmet.ico")
 
     # Create a frame to hold the chat messages
     messages_frame = tk.Frame(root)
@@ -147,7 +147,9 @@ pygame.init()
 width_dis = 360
 height_dis = 650
 win = pygame.display.set_mode((width_dis, height_dis))
-pygame.display.set_caption("Client")
+pygame.display.set_caption("Racing Game")
+icon = pygame.image.load("racing-helmet.png")
+pygame.display.set_icon(icon)
 vel = 1
 clientNumber = 0
 ready1 = 0
