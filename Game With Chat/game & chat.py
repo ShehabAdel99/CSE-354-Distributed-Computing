@@ -13,10 +13,10 @@ global client_socket
 def chat_window():
     # Create the main window
     root = tk.Tk()
-    root.title("Race Chat")
+    root.title("Racer Chat")
 
     # Set the window icon
-    root.iconbitmap("racing-helmet.ico")
+    root.iconbitmap("racer.ico")
 
     # Create a frame to hold the chat messages
     messages_frame = tk.Frame(root)
@@ -148,7 +148,7 @@ width_dis = 360
 height_dis = 650
 win = pygame.display.set_mode((width_dis, height_dis))
 pygame.display.set_caption("Racing Game")
-icon = pygame.image.load("racing-helmet.png")
+icon = pygame.image.load("sports-car.png")
 pygame.display.set_icon(icon)
 vel = 1
 clientNumber = 0
