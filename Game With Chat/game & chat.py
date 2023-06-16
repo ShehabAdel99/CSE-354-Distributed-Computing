@@ -265,26 +265,71 @@ def chat_window():
 
     entry_frame.pack()
 
-    # Create a socket connection to the server
-    global client_socket
-    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect(('192.168.1.74', 50000))
+    # Create a frame to hold the alias label and entry field
+    alias_frame = tk.Frame(root)
+    alias_label = tk.Label(alias_frame, text="Enter your Name:")
+    # Set the appearance of the alias label
+    alias_label.config(border=10, highlightthickness=0, relief=tk.FLAT, font=("Arial", 12), fg="#333333")
+    alias_label.pack(side=tk.LEFT)
+    alias_entry = tk.Entry(alias_frame)
+    # Set the appearance of the alias entry field
+    alias_entry.config(border=5, highlightthickness=0, relief=tk.FLAT, font=("Arial", 12))
+    alias_entry.pack(side=tk.LEFT)
+    alias_frame.pack()
 
-    # Function to handle receiving messages from the server and displaying them in the chat window
-    def receive():
-        while True:
-            try:
-                message = client_socket.recv(1024).decode('utf-8')
-                msg_list.insert(tk.END, message)
-            except:
-                print('Error!')
-                client_socket.close()
-                root.quit()
-                break
+    # Function to get the user's alias and connect to the server
+    def connect():
+        alias = alias_entry.get()
+        if alias:
+            # Create a socket connection to the server
+            global client_socket
+            client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            client_socket.connect(('192.168.1.74', 50000))
+            client_socket.send(bytes(alias, "utf8"))
+            # Play a revving engine sound effect
+            winsound.PlaySound("engine_sound.wav", winsound.SND_FILENAME)
+            # Remove the alias entry fields and connect button
+            alias_frame.pack_forget()
+            connect_button.pack_forget()
+            # Create a button to quit
+            quit_button = tk.Button(root, text="Quit 🚪", command=quit)
+            # Set the appearance of the quit button
+            quit_button.config(border=1, highlightthickness=5, relief=tk.FLAT, font=("Arial", 12), bg="#dc3545",
+                               fg="#ffffff", bd=1, activebackground="#c82333", activeforeground="#ffffff",
+                               cursor="hand2")
 
-    # Create a thread to receive messages from the server
-    receive_thread = threading.Thread(target=receive)
-    receive_thread.start()
+            quit_button.pack()
+
+            # Function to handle receiving messages from the server and displaying them in the chat window
+            def receive():
+                while True:
+                    try:
+                        message = client_socket.recv(1024).decode('utf-8')
+                        msg_list.insert(tk.END, message)
+                    except:
+                        print('Error!')
+                        client_socket.close()
+                        root.quit()
+                        break
+
+            # Create a thread to receive messages from the server
+            receive_thread = threading.Thread(target=receive)
+            receive_thread.start()
+
+    # Create a button to connect to the server
+    connect_button = tk.Button(root, text="Connect 🏁", command=connect)
+    # Set the appearance of the connect button
+    connect_button.config(border=1, highlightthickness=5, relief=tk.FLAT, font=("Arial", 12), bg="#007bff",
+                          fg="#ffffff", cursor="hand2")
+    connect_button.pack()
+
+    # Function to quit the client's connection to the server
+    def quit():
+        client_socket.send(bytes("{quit}", "utf8"))
+        client_socket.close()
+        root.quit()
+
+    connect()
 
     # Start the chat window mainloop
     root.mainloop()
