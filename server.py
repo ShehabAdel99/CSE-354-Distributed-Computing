@@ -51,6 +51,21 @@ def insert_player1_info():
 
 insert_player1_info()
 
+def insert_player2_info():
+    p2_information=game_db.game
+    information2 = [200,500,0,0]
+    information={
+        "x":information2[0],
+        "y":information2[1],
+        "crash":information2[2],
+        "ready":information2[3]
+    }
+    p2_information.insert_one(information)
+
+
+
+insert_player2_info()
+
 def threaded_client(conn,player):
     conn.send(str.encode(make_pos(pos[player])))
     reply=""
