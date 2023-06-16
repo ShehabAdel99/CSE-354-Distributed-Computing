@@ -14,9 +14,9 @@ port=5555
 password = os.environ.get("MONGODB_PWD")
 
 connection_string = f"mongodb+srv://omaaarsg2001:{password}@cluster0.wfljxfn.mongodb.net/?retryWrites=true&w=majority"
-
 client = MongoClient(connection_string)
 dbs = client.list_database_names()
+game_db=client.game
 s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 def read_pos(str):
      str=str.split(",")
@@ -36,23 +36,20 @@ print("Waiting for a connection")
 
 
 
-def insert_player_info():
-    information=player_db.player
-    p1_information = [50, 500, 0, 0]
-    p2_information = [200, 500, 0, 0]
+def insert_player1_info():
+    p1_information=game_db.game
+    information1 = [50, 500, 0, 0]
+    information={
+        "x":information1[0],
+        "y":information1[1],
+        "crash":information1[2],
+        "ready":information1[3]
+    }
+    p1_information.insert_one(information)
 
-    arr = []
-    arr2 = []
-    for p1_info, p2_info in zip(p1_information, p2_information):
-        result1 = {"p1_info":p1_info}
-        result2 = {"p2_info":p2_info}
 
-        arr.append(result1)
-        arr2.append(result2)
-    information.insert_many(arr)
-    information.insert_many(arr2)
 
-insert_player_info()
+insert_player1_info()
 
 def threaded_client(conn,player):
     conn.send(str.encode(make_pos(pos[player])))
