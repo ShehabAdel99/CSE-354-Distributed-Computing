@@ -17,6 +17,7 @@ connection_string = f"mongodb+srv://omaaarsg2001:{password}@cluster0.wfljxfn.mon
 client = MongoClient(connection_string)
 dbs = client.list_database_names()
 game_db=client.game
+game_db =game_db.game
 s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 def read_pos(str):
      str=str.split(",")
@@ -37,7 +38,6 @@ print("Waiting for a connection")
 
 
 def insert_player1_info():
-    p1_information=game_db.game
     information1 = [50, 500, 0, 0]
     information={
         "x":information1[0],
@@ -45,14 +45,13 @@ def insert_player1_info():
         "crash":information1[2],
         "ready":information1[3]
     }
-    p1_information.insert_one(information)
+    game_db.insert_one(information)
 
 
 
 insert_player1_info()
 
 def insert_player2_info():
-    p2_information=game_db.game
     information2 = [200,500,0,0]
     information={
         "x":information2[0],
@@ -60,11 +59,30 @@ def insert_player2_info():
         "crash":information2[2],
         "ready":information2[3]
     }
-    p2_information.insert_one(information)
+    game_db.insert_one(information)
 
 
 
 insert_player2_info()
+
+
+def get_person_by_id(person_id):
+    from bson.objectid import ObjectId
+    _id = ObjectId(person_id)
+    res = game_db.find_one({"_id": _id})
+    return res
+#get_person_by_id("648baafce1784ec7f4592892")
+#
+# def update_person_by_id(person_id):
+#     from bson.objectid import ObjectId
+#     _id = ObjectId(person_id)
+#     all_updtes = {
+#         "$set": {"x": },
+#
+#
+#     }
+#     #country_capital.update_one({"_id":_id},all_updtes)
+#     country_capital.update_one({"_id":_id},{"$unset":{"new_field":""}})
 
 def threaded_client(conn,player):
     conn.send(str.encode(make_pos(pos[player])))
@@ -74,7 +92,17 @@ def threaded_client(conn,player):
     while True:
         try:
             data=read_pos(conn.recv(2048).decode())
-            pos[player]=data # hena ha7ot l data 3ala hasab anhy player
+            if(player == 0):
+                p1_id=get_person_by_id("648baafce1784ec7f4592892")
+                game_db.update_one({"_id": ObjectId(p1_id)},
+                                        {"$set": {"x": data[0], "y": data[1], "crash": 0}})
+                #updated_p1=data
+            elif(player==1):
+                p2_id=get_person_by_id("648babb6a63e936ac6370be7")
+                game_db.update_one({"_id": ObjectId(p2_id)},
+                                   {"$set": {"x": data[0], "y": data[1], "crash": 0}})
+                #updated_p2=data
+            #pos[player]=data # hena ha7ot l data 3ala hasab anhy player
 
             if not data:
                 print("Disconnected")
