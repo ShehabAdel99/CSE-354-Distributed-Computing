@@ -206,7 +206,10 @@ def redrawWindow(win, player, player2):
 def chat_window():
     # Create the main window
     root = tk.Tk()
-    root.title("Chat Room")
+    root.title("Race Chat")
+
+    # Set the window icon
+    root.iconbitmap("race_icon.ico")
 
     # Create a frame to hold the chat messages
     messages_frame = tk.Frame(root)
