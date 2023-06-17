@@ -119,8 +119,15 @@ def chat_window():
                         if message.startswith(alias):
                             # Format the message as sent by the client
                             # message = message[len(alias) + 1:]  # Remove the alias prefix from the message
-                            msg_list.insert(tk.END, message)
-                            msg_list.itemconfig(tk.END, fg="blue")
+                            if message.endswith("connected!"):
+                                msg_list.insert(tk.END, message)
+                                msg_list.itemconfig(tk.END, fg="blue")
+                            else:
+                                parts = message.split(':')
+                                parts[0] = "You "
+                                message = ':'.join(parts)
+                                msg_list.insert(tk.END, message)
+                                msg_list.itemconfig(tk.END, fg="blue")
                         else:
                             # Format the message as received from the server
                             msg_list.insert(tk.END, message)
@@ -329,21 +336,22 @@ def redrawWindow(win, player, player2):
     player2.draw(win)
     pygame.display.update()
 
+chat_playing = True  # flag to control entering chat while playing
 
 def main():
     global crash2
     global crash1
     global run1
     global ready1
-
+    global chat_playing
 
     n = network()
     car_image = r"D:\Lectures\Senior-1\Semester 8\Distributed\pythonProject\projectDis\img\car.png"
     car_image2 = r"D:\Lectures\Senior-1\Semester 8\Distributed\pythonProject\projectDis\img\enemy_car_2.png"
     bg_img = pygame.image.load(r"D:\Lectures\Senior-1\Semester 8\Distributed\pythonProject\projectDis\img\White-broken-lines.png")
     scaled_image = pygame.transform.scale(bg_img, (360, 650))
-    p = Player(50, 500, 49, 100, car_image2, scaled_image)
-    p2 = Player(0,0, 49, 100, car_image, scaled_image)
+    p = Player(120, 500, 49, 100, car_image2, scaled_image)
+    p2 = Player(60,0, 49, 100, car_image, scaled_image)
     clock=pygame.time.Clock()
     space_click=0
     xc = 0
@@ -382,6 +390,12 @@ def main():
               chat_thread.start()
 
       while space_click:
+
+          keys = pygame.key.get_pressed()
+          if keys[pygame.K_c] and chat_playing == True:
+              chat_thread = threading.Thread(target=chat_window)
+              chat_thread.start()
+
           p2Pos = read_pos(n.send(make_pos((p.x, p.y, crash1, ready1))))
           p2.x = p2Pos[0]
           p2.y = p2Pos[1]
@@ -407,7 +421,7 @@ def main():
               pygame.display.flip()
 
           elif  ready2==1 and crash2==1 :
-
+                chat_playing = False
                 p.display_message("you win!!", win)
                 win.fill((202, 228, 241))
                 font = pygame.font.SysFont("comicsans", 20)
@@ -424,14 +438,20 @@ def main():
                         if event.key == pygame.K_ESCAPE:
                             run1 = False
                         if event.key == pygame.K_SPACE:
+
                             pressed_key2=1
                             again==1
                             # ready1=0
                             space_click = False
+                        if event.key == pygame.K_c:
+                            chat_playing = True
+                            chat_thread = threading.Thread(target=chat_window)
+                            chat_thread.start()
 
 
 
           elif ready2==1 and  crash1==1 :
+              chat_playing = False
               win.fill((202, 228, 241))
               font = pygame.font.SysFont("comicsans", 20)
               text = font.render("Press Space to play again!", 1, (58, 78, 91))
@@ -447,12 +467,14 @@ def main():
                           if event.key == pygame.K_ESCAPE:
                               run1 = False
                           if event.key == pygame.K_SPACE:
-
                                   crash1 = 0
                                   pressed_key2 = 1
                                   ready1=0
-
                                   space_click= False
+                          if event.key == pygame.K_c:
+                              chat_playing = True
+                              chat_thread = threading.Thread(target=chat_window)
+                              chat_thread.start()
           elif ready2 == 1 and crash2 == 0:
 
             p.move(win)
