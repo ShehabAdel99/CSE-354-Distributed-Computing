@@ -26,14 +26,22 @@ def handle_client(client):
     while True:
         try:
             message = client.recv(1024)
-            broadcast(message)
-        except:
+            if not message:
+                break
+            alias_index = clients.index(client)
+            alias = aliases[alias_index]
+            if message.decode('utf-8').startswith('You: '):
+                broadcast(f'{alias}: {message.decode("utf-8")}'.encode('utf-8'))
+            else:
+                broadcast(f'{alias}: {message.decode("utf-8")}'.encode('utf-8'))
+        except Exception as e:
+            print(f"Error: {e}")
             index = clients.index(client)
             clients.remove(client)
-            client.close()
             alias = aliases[index]
-            broadcast(f'{alias} has left the chat room!'.encode('utf-8'))
             aliases.remove(alias)
+            client.close()
+            broadcast(f'{alias} has left the chat room!'.encode('utf-8'))
             break
 
 # Function to receive client connections for the chat box server
