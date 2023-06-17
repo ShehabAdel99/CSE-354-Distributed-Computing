@@ -66,7 +66,9 @@ def chat_window():
     send_button = tk.Button(entry_frame, text="Send 🏎", command=send)
 
     # Set the appearance of the send button
-    send_button.config(border=1, highlightthickness=5, relief=tk.FLAT, font=("Arial", 12), bg="#007bff", fg="#ffffff",cursor="hand2")
+    send_button.config(border=1, highlightthickness=5, relief=tk.FLAT, font=("Arial", 12), bg="#007bff", fg="#ffffff",
+                       cursor="hand2")
+
     send_button.pack(side=tk.RIGHT)
 
     entry_frame.pack()
