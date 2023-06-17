@@ -30,10 +30,10 @@ def handle_client(client):
                 break
             alias_index = clients.index(client)
             alias = aliases[alias_index]
-            if message.decode('utf-8').startswith('You: '):
-                broadcast(f'{alias}: {message.decode("utf-8")}'.encode('utf-8'))
-            else:
-                broadcast(f'{alias}: {message.decode("utf-8")}'.encode('utf-8'))
+            # if message.decode('utf-8').startswith('You: '):
+            #     broadcast(f'{alias}: {message.decode("utf-8")}'.encode('utf-8'))
+            # else:
+            broadcast(f'{alias}: {message.decode("utf-8")}'.encode('utf-8'))
         except Exception as e:
             print(f"Error: {e}")
             index = clients.index(client)
