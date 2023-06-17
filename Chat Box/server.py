@@ -2,8 +2,8 @@ import threading
 import socket
 
 # Define the server address and port
-host = '172.31.45.134'
-port = 59000
+host = '15.185.64.102'
+port = 50174
 
 # Create a socket connection
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
