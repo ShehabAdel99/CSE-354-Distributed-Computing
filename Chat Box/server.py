@@ -2,7 +2,7 @@ import threading
 import socket
 
 # Define the server address and port
-host = '192.168.1.5'
+host = '127.0.0.1'
 port = 59000
 
 # Create a socket connection
