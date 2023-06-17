@@ -66,7 +66,7 @@ def chat_window():
     send_button = tk.Button(entry_frame, text="Send 🏎", command=send)
 
     # Set the appearance of the send button
-    send_button.config(border=1, highlightthickness=5, relief=tk.FLAT, font=("Arial", 12), bg="#007bff", fg="#ffffff")
+    send_button.config(border=1, highlightthickness=5, relief=tk.FLAT, font=("Arial", 12), bg="#007bff", fg="#ffffff",cursor="hand2")
 
     send_button.pack(side=tk.RIGHT)
 
@@ -124,10 +124,12 @@ def chat_window():
             receive_thread.start()
 
     # Create a button to connect to the server
-    connect_button = tk.Button(root, text="Connect 🏁", command=connect)
+    connect_button = tk.Button(root, text="Connect 🚀", command=connect)
+
     # Set the appearance of the connect button
-    connect_button.config(border=1, highlightthickness=5, relief=tk.FLAT, font=("Arial", 12), bg="#007bff",
-                          fg="#ffffff", cursor="hand2")
+    connect_button.config(border=1, highlightthickness=5, relief=tk.FLAT, font=("Arial", 12), bg="#28a745",
+                          fg="#ffffff",
+                          bd=1, activebackground="#218838", activeforeground="#ffffff", cursor="hand2")
     connect_button.pack()
 
     # Function to quit the client's connection to the server
