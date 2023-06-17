@@ -66,7 +66,7 @@ def chat_window():
     send_button = tk.Button(entry_frame, text="Send 🏎", command=send)
 
     # Set the appearance of the send button
-    send_button.config(border=1, highlightthickness=5, relief=tk.FLAT, font=("Arial", 12), bg="#007bff", fg="#ffffff",cursor="hand2")
+    send_button.config(border=1, highlightthickness=5, relief=tk.FLAT, font=("Arial", 12), bg="#007bff", fg="#ffffff")
 
     send_button.pack(side=tk.RIGHT)
 
@@ -86,6 +86,7 @@ def chat_window():
 
     # Function to get the user's alias and connect to the server
     def connect():
+        global alias
         alias = alias_entry.get()
         if alias:
             # Create a socket connection to the server
@@ -112,14 +113,24 @@ def chat_window():
                 while True:
                     try:
                         message = client_socket.recv(1024).decode('utf-8')
-                        msg_list.insert(tk.END, message)
-                    except:
-                        print('Error!')
+
+                        # Determine if the message was sent by the client or received from the server
+                        if message.startswith(alias):
+                            # Format the message as sent by the client
+                            # message = message[len(alias) + 1:]  # Remove the alias prefix from the message
+                            msg_list.insert(tk.END, message)
+                            msg_list.itemconfig(tk.END, fg="blue")
+                        else:
+                            # Format the message as received from the server
+                            msg_list.insert(tk.END, message)
+                            msg_list.itemconfig(tk.END, fg="green")
+                    except Exception as e:
+                        print('Error:', e)
                         client_socket.close()
                         root.quit()
                         break
 
-            # Create a thread to receive messages from the server
+            # Create a thread to handle receiving messages from the server
             receive_thread = threading.Thread(target=receive)
             receive_thread.start()
 
@@ -130,17 +141,18 @@ def chat_window():
     connect_button.config(border=1, highlightthickness=5, relief=tk.FLAT, font=("Arial", 12), bg="#28a745",
                           fg="#ffffff",
                           bd=1, activebackground="#218838", activeforeground="#ffffff", cursor="hand2")
+
     connect_button.pack()
 
-    # Function to quit the client's connection to the server
+    # Function to quit the program and close the socket connection
     def quit():
         client_socket.send(bytes("{quit}", "utf8"))
         client_socket.close()
         root.quit()
 
-    connect()
+    root.protocol("WM_DELETE_WINDOW", quit)
 
-    # Start the chat window mainloop
+    # Start the GUI event loop
     root.mainloop()
 
 
