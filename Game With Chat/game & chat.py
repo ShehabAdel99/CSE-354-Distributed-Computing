@@ -1,5 +1,6 @@
 import threading
 import socket
+import time
 import tkinter as tk
 import winsound
 import pygame
@@ -393,6 +394,7 @@ def main():
 
           keys = pygame.key.get_pressed()
           if keys[pygame.K_c] and chat_playing == True:
+              time.sleep(0.25) # handling debounce delay of pressing 'c'
               chat_thread = threading.Thread(target=chat_window)
               chat_thread.start()
 
