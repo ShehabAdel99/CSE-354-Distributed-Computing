@@ -440,7 +440,7 @@ def main():
                         if event.key == pygame.K_ESCAPE:
                             run1 = False
                         if event.key == pygame.K_SPACE:
-
+                            chat_playing = True
                             pressed_key2=1
                             again==1
                             # ready1=0
@@ -469,10 +469,11 @@ def main():
                           if event.key == pygame.K_ESCAPE:
                               run1 = False
                           if event.key == pygame.K_SPACE:
-                                  crash1 = 0
-                                  pressed_key2 = 1
-                                  ready1=0
-                                  space_click= False
+                                chat_playing = True
+                                crash1 = 0
+                                pressed_key2 = 1
+                                ready1=0
+                                space_click= False
                           if event.key == pygame.K_c:
                               chat_playing = True
                               chat_thread = threading.Thread(target=chat_window)
