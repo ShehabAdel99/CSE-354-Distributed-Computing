@@ -104,7 +104,7 @@ def chat_window():
             # Create a socket connection to the server
             global client_socket
             client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            client_socket.connect(("192.168.1.9", 50000))
+            client_socket.connect(("157.175.216.125", 50000))
             client_socket.send(bytes(alias, "utf8"))
             # Play a revving engine sound effect
             winsound.PlaySound("engine_sound.wav", winsound.SND_FILENAME)
@@ -185,7 +185,7 @@ win = pygame.display.set_mode((width_dis, height_dis))
 pygame.display.set_caption("Racing game")
 icon = pygame.image.load("sports-car.png")
 pygame.display.set_icon(icon)
-vel = 1
+vel = 13
 clientNumber = 0
 ready1 = 0
 crash1=0
@@ -212,11 +212,11 @@ class Player():
         self.bg_img_x2 = (width_dis / 2) - (360 / 2)
         self.bg_img_y1 = 0
         self.bg_img_y2 = -600
-        self.bg_img_speed = 0.7
+        self.bg_img_speed = 21
         self.enemy_car = pygame.image.load(r"C:\Users\melsh\Desktop\gam3a\projectDis - Copy\img\enemy_car_1.png")
         self.enemy_car_startx = random.randrange(100, 360)
         self.enemy_car_starty = -600
-        self.enemy_car_speed = 0.5
+        self.enemy_car_speed = 15
         self.enemy_car_width = 49
         self.enemy_car_height = 100
 
@@ -277,8 +277,8 @@ class Player():
 
         count += 1
         if (count % 10000 == 0):
-            self.enemy_car_speed += 0.05
-            self.bg_img_speed += 0.05
+            self.enemy_car_speed += 10
+            self.bg_img_speed += 10
 
         if self.enemy_car_starty + self.enemy_car_height > self.y + 25 and self.enemy_car_starty < self.y + self.height - 25:
             if self.x + 25 > self.enemy_car_startx and self.x + 25 < self.enemy_car_startx + self.enemy_car_width:
@@ -290,8 +290,8 @@ class Player():
                 self.y = 550
                 self.enemy_car_starty = -600
                 self.enemy_car_startx = random.randrange(100, 300)
-                self.enemy_car_speed = 0.5
-                self.bg_img_speed = 0.7
+                self.enemy_car_speed = 15
+                self.bg_img_speed = 21
                 count = 0
         if self.x < 20 or self.x > 300:
                 self.crashed = True
@@ -316,8 +316,8 @@ class Player():
         self.y = self.yin
         self.enemy_car_starty = -600
         self.enemy_car_startx = random.randrange(100, 300)
-        self.enemy_car_speed = 0.5
-        self.bg_img_speed = 0.7
+        self.enemy_car_speed = 15
+        self.bg_img_speed = 21
         count = 0
 
         # Pause the game until the player chooses to play again
@@ -391,7 +391,7 @@ def main():
     space_click=0
     xc = 0
     yc = height_dis  // 2
-    vel_x = 1.5
+    vel_x = 15
     vel_y = 0
     white = (255, 255, 255)
 
@@ -443,7 +443,7 @@ def main():
 
               win.fill((135, 206, 250))
               win.blit(image3, (xc, yc))
-              win.blit(text1, (155 - text.get_width() // 2, 100 - text.get_height() // 3))
+              win.blit(text1, (155 - text1.get_width() // 2, 100 - text1.get_height() // 3))
               pygame.display.flip()
 
 
