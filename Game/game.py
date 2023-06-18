@@ -65,8 +65,7 @@ def chat_window():
             client_socket.close()
             root.quit()
 
-        # Play a sound effect
-        winsound.PlaySound("car_sound.wav", winsound.SND_FILENAME)
+       
 
     # Bind the send function to the Return key
     entry_field.bind("<Return>", send)
@@ -105,7 +104,7 @@ def chat_window():
             client_socket.connect(("157.175.216.125", 50000))
             client_socket.send(bytes(alias, "utf8"))
             # Play a sound effect
-            winsound.PlaySound("engine_sound.wav", winsound.SND_FILENAME)
+            winsound.PlaySound("sound/Notification.wav", winsound.SND_FILENAME)
             # Remove the alias entry fields and connect button
             alias_frame.pack_forget()
             connect_button.pack_forget()
