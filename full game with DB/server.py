@@ -11,13 +11,13 @@ from pymongo import MongoClient
 password = os.environ.get("MONGODB_PWD")
 connection_string=f"mongodb+srv://melshafaie123:{password}@game.czsmeor.mongodb.net/?retryWrites=true&w=majority"
 client=MongoClient(connection_string)
-server="157.175.216.125"
+server="172.31.45.134"
 port=5555
 # client = MongoClient(connection_string)
 db = client["game_database"]
 collection = db["game_state"]
 # Define the server address and port for the chat box server
-chat_box_host = "157.175.216.125"
+chat_box_host = "172.31.45.134"
 chat_box_port = 50000
 
 # Create a socket connection for the chat box server
