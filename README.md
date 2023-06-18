@@ -23,6 +23,9 @@ The race continues until one of the players reaches the finish line, and the win
 
 # Screenshots 📷
 
+| Screenshot 1 | Screenshot 2 | Screenshot 3 |
+|--------------|--------------|--------------|
+| ![Screenshot 1](Screenshots/Screenshot1.png) | ![Screenshot 2](Screenshots/Screenshot2.png) | ![Screenshot 3](Screenshots/Screenshot3.png) |
 # Demo 🎥
 
 [![Video Demo](https://img.youtube.com/vi/OYNIrqZUx9Y/0.jpg)](https://www.youtube.com/watch?v=OYNIrqZUx9Y "Car Racer2D")
