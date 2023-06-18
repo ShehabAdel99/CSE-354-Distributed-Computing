@@ -1,8 +1,6 @@
 import threading
 import socket
 from _thread import *
-import pygame
-import sys
 from dotenv import load_dotenv , find_dotenv
 import os
 load_dotenv(find_dotenv())
