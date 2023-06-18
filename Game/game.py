@@ -11,6 +11,8 @@ from dotenv import load_dotenv , find_dotenv
 import os
 load_dotenv(find_dotenv())
 from pymongo import MongoClient
+
+# Connecting to our Database
 password = os.environ.get("MONGODB_PWD")
 connection_string=f"mongodb+srv://melshafaie123:{password}@game.czsmeor.mongodb.net/?retryWrites=true&w=majority"
 client=MongoClient(connection_string)
@@ -38,11 +40,7 @@ def chat_window():
 
     # Set the chat bubble appearance
     msg_list.config(border=10, highlightthickness=10, relief=tk.FLAT, font=("Arial", 12), justify=tk.LEFT)
-
-    # Set the background color and foreground color of the chat bubbles
     msg_list.config(bg="#f7f7f7", fg="#333333")
-
-    # Set the color of the selection highlight
     msg_list.config(selectbackground="#b5d5ff", selectforeground="#333333")
 
     scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
@@ -67,7 +65,7 @@ def chat_window():
             client_socket.close()
             root.quit()
 
-        # Play a revving engine sound effect
+        # Play a sound effect
         winsound.PlaySound("car_sound.wav", winsound.SND_FILENAME)
 
     # Bind the send function to the Return key
@@ -106,7 +104,7 @@ def chat_window():
             client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             client_socket.connect(("157.175.216.125", 50000))
             client_socket.send(bytes(alias, "utf8"))
-            # Play a revving engine sound effect
+            # Play a sound effect
             winsound.PlaySound("engine_sound.wav", winsound.SND_FILENAME)
             # Remove the alias entry fields and connect button
             alias_frame.pack_forget()
@@ -129,12 +127,11 @@ def chat_window():
                         # Determine if the message was sent by the client or received from the server
                         if message.startswith(alias):
                             # Format the message as sent by the client
-                            # message = message[len(alias) + 1:]  # Remove the alias prefix from the message
-                            if message.endswith("connected!"):
+                            if message.endswith("connected!"): # appearance of informing connection
                                 msg_list.insert(tk.END, message)
                                 msg_list.itemconfig(tk.END, fg="blue")
                             else:
-                                parts = message.split(':')
+                                parts = message.split(':')  ## Format the message as sent by the client
                                 parts[0] = "You "
                                 message = ':'.join(parts)
                                 msg_list.insert(tk.END, message)
@@ -183,7 +180,7 @@ width_dis = 360
 height_dis = 650
 win = pygame.display.set_mode((width_dis, height_dis))
 pygame.display.set_caption("Racing game")
-icon = pygame.image.load("sports-car.png")
+icon = pygame.image.load("img/sports-car.png")
 pygame.display.set_icon(icon)
 vel = 13
 clientNumber = 0
@@ -213,7 +210,7 @@ class Player():
         self.bg_img_y1 = 0
         self.bg_img_y2 = -600
         self.bg_img_speed = 21
-        self.enemy_car = pygame.image.load(r"C:\Users\melsh\Desktop\gam3a\projectDis - Copy\img\enemy_car_1.png")
+        self.enemy_car = pygame.image.load(r"img/enemy_car_1.png")
         self.enemy_car_startx = random.randrange(100, 360)
         self.enemy_car_starty = -600
         self.enemy_car_speed = 15
@@ -369,9 +366,9 @@ def main():
 
 
     n = network()
-    car_image = r"C:\Users\melsh\Desktop\gam3a\projectDis - Copy\img\car.png"
-    car_image2 = r"C:\Users\melsh\Desktop\gam3a\projectDis - Copy\img\enemy_car_2.png"
-    bg_img = pygame.image.load(r"C:\Users\melsh\Desktop\gam3a\projectDis - Copy\img\White-broken-lines.png")
+    car_image = r"img/car.png"
+    car_image2 = r"img/enemy_car_2.png"
+    bg_img = pygame.image.load(r"img/White-broken-lines.png")
     scaled_image = pygame.transform.scale(bg_img, (360, 650))
     game_state = collection.find_one({"game_id": "my_game"})
     if game_state:
@@ -398,7 +395,7 @@ def main():
     while run1:
       pressed_key2 = 0
       clock.tick(100)
-      bg_image5 = pygame.image.load(r"C:\Users\melsh\Desktop\gam3a\projectDis - Copy\img\amr-02.jpg")
+      bg_image5 = pygame.image.load(r"img/Game lobby.png")
       bg_image5 = pygame.transform.scale(bg_image5, (width_dis, height_dis))
       win.blit(bg_image5, (0, 0))
 
@@ -431,7 +428,7 @@ def main():
           p2.update()
 
           if  ready2==0 and crash2==0 and crash1==0 and readye==0 :
-              image3 = pygame.image.load(r"C:\Users\melsh\Desktop\gam3a\projectDis - Copy\img\a6rBl.png")
+              image3 = pygame.image.load(r"img/loading.png")
               scaled_image = pygame.transform.scale(image3, (10, 15))
               image_rect = scaled_image.get_rect()
               font = pygame.font.SysFont("comicsansms", 20, True)
