@@ -9,8 +9,17 @@ load_dotenv(find_dotenv())
 from pymongo import MongoClient
 
 
+
+password = os.environ.get("MONGODB_PWD")
+connection_string=f"mongodb+srv://melshafaie123:{password}@game.czsmeor.mongodb.net/?retryWrites=true&w=majority"
+client=MongoClient(connection_string)
+server="192.168.1.9"
+port=5555
+# client = MongoClient(connection_string)
+db = client["game_database"]
+collection = db["game_state"]
 # Define the server address and port for the chat box server
-chat_box_host = '192.168.1.74'
+chat_box_host = "192.168.1.9"
 chat_box_port = 50000
 
 # Create a socket connection for the chat box server
@@ -67,17 +76,9 @@ def receive_chat_box():
         thread.start()
 
 
-# Define the server address and port for the game server
-lock = threading.Lock()
-password = os.environ.get("MONGODB_PWD")
-connection_string=f"mongodb+srv://melshafaie123:{password}@game.czsmeor.mongodb.net/?retryWrites=true&w=majority"
-client=MongoClient(connection_string)
-server="192.168.1.74"
-port=5555
 
-# client = MongoClient(connection_string)
-db = client["game_database"]
-collection = db["game_state"]
+
+
 
 s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 def read_pos(str):
@@ -183,13 +184,14 @@ def threaded_client(conn, player):
     conn.close()
 
 
-# Function to receive game server connections
+
 def receive_game_server():
+    global currentPlayer
     while True:
 
         conn, addr = s.accept()
         print("Connected to:", addr)
-        start_new_thread(threaded_client, (conn, currentPlayer))
+        start_new_thread(threaded_client, (conn,currentPlayer))
         if currentPlayer < 1:
             currentPlayer += 1
 
