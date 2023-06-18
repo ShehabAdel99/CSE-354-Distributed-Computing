@@ -94,7 +94,7 @@ def chat_window():
             # Create a socket connection to the server
             global client_socket
             client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            client_socket.connect(('192.168.1.74', 50000))
+            client_socket.connect(('157.175.87.234', 50000))
             client_socket.send(bytes(alias, "utf8"))
             # Play a revving engine sound effect
             winsound.PlaySound("engine_sound.wav", winsound.SND_FILENAME)
