@@ -1,10 +1,18 @@
-import threading
+
 
 import pygame
 from network import network
 import random
 from time import sleep
-
+from dotenv import load_dotenv , find_dotenv
+import os
+load_dotenv(find_dotenv())
+from pymongo import MongoClient
+password = os.environ.get("MONGODB_PWD")
+connection_string=f"mongodb+srv://melshafaie123:{password}@game.czsmeor.mongodb.net/?retryWrites=true&w=majority"
+client=MongoClient(connection_string)
+db = client["game_database"]
+collection = db["game_state"]
 
 pygame.init()
 width_dis = 360
@@ -17,7 +25,7 @@ ready1 = 0
 crash1=0
 crash2=0
 run1=True
-lock =threading.Lock
+count=0
 class Player():
     def __init__(self, x, y, width, height, car_image, bg_image):
         self.crashed = False
@@ -39,7 +47,6 @@ class Player():
         self.bg_img_y1 = 0
         self.bg_img_y2 = -600
         self.bg_img_speed = 0.7
-        self.count = 0
         self.enemy_car = pygame.image.load('.\\img\\enemy_car_1.png')
         self.enemy_car_startx = random.randrange(100, 360)
         self.enemy_car_starty = -600
@@ -61,7 +68,7 @@ class Player():
 
         if self.bg_img_y2 >= height_dis:
             self.bg_img_y2 = -600
-        self.highscore(self.count, win)
+        self.highscore(count, win)
 
     def draw(self, win):
         win.blit(self.car_image, self.rect)
@@ -71,6 +78,7 @@ class Player():
     def move(self, win):
         global crash1
         global ready1
+        global count
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.crashed = True
@@ -101,8 +109,8 @@ class Player():
 
 
 
-        self.count += 1
-        if (self.count % 10000 == 0):
+        count += 1
+        if (count % 10000 == 0):
             self.enemy_car_speed += 0.05
             self.bg_img_speed += 0.05
 
@@ -118,7 +126,7 @@ class Player():
                 self.enemy_car_startx = random.randrange(100, 300)
                 self.enemy_car_speed = 0.5
                 self.bg_img_speed = 0.7
-                self.count = 0
+                count = 0
         if self.x < 20 or self.x > 300:
                 self.crashed = True
                 self.display_message("You lost!", win)
@@ -132,6 +140,7 @@ class Player():
         self.update()
 
     def display_message(self, msg, win):
+        global count
         font = pygame.font.SysFont("comicsansms", 30, True)
         text = font.render(msg, True, (255, 255, 255))
         win.blit(text, (200 - text.get_width() // 2, 150 - text.get_height() // 3))
@@ -143,7 +152,7 @@ class Player():
         self.enemy_car_startx = random.randrange(100, 300)
         self.enemy_car_speed = 0.5
         self.bg_img_speed = 0.7
-        self.count = 0
+        count = 0
 
         # Pause the game until the player chooses to play again
         clock = pygame.time.Clock()
@@ -162,18 +171,25 @@ class Player():
 
 
 def read_pos(str):
-    str=str.split(",")
-    return int(str[0]), int(str[1]), int(str[2]), int(str[3])
+    str = str.split(",")
+    return int(str[0]), int(str[1]), int(str[2]), int(str[3]), int(str[4])
 
 
 def make_pos(tup):
-    return str(tup[0]) + "," + str(tup[1]) + "," + str(tup[2])+ "," + str(tup[3])
+    return str(tup[0]) + "," + str(tup[1]) + "," + str(tup[2]) + "," + str(tup[3]) + "," + str(tup[4])
 
 
 def redrawWindow(win, player, player2):
     player.draw(win)
     player2.draw(win)
     pygame.display.update()
+game_state_structure = {
+    "game_id": "my_game",
+    "pos": [
+        (),
+        ()
+    ]
+}
 
 
 def main():
@@ -181,6 +197,8 @@ def main():
     global crash1
     global run1
     global ready1
+    global count
+    readye=0
 
 
     n = network()
@@ -188,15 +206,26 @@ def main():
     car_image2 = r"C:\Users\melsh\Desktop\gam3a\projectDis\img\enemy_car_2.png"
     bg_img = pygame.image.load(r"C:\Users\melsh\Desktop\gam3a\projectDis\img\White-broken-lines.png")
     scaled_image = pygame.transform.scale(bg_img, (360, 650))
-    p = Player(50, 500, 49, 100, car_image2, scaled_image)
-    p2 = Player(0,0, 49, 100, car_image, scaled_image)
+    game_state = collection.find_one({"game_id": "my_game"})
+    if game_state:
+     if game_state["discar"]==1:
+      p = Player(game_state["pos"][1][0], game_state["pos"][1][1], 49, 100, car_image2, scaled_image)
+      count=game_state["pos"][1][3]
+      p2 = Player(game_state["pos"][0][0], game_state["pos"][0][1], 49, 100, car_image, scaled_image)
+     else:
+      p = Player(game_state["pos"][0][0], game_state["pos"][0][1], 49, 100, car_image2, scaled_image)
+      count = game_state["pos"][0][3]
+      p2 = Player(game_state["pos"][1][0], game_state["pos"][1][1], 49, 100, car_image, scaled_image)
+
+    else:
+     p = Player(150, 500, 49, 100, car_image2, scaled_image)
+     p2 = Player(150,500, 49, 100, car_image, scaled_image)
     clock=pygame.time.Clock()
     space_click=0
     xc = 0
     yc = height_dis  // 2
     vel_x = 1.5
     vel_y = 0
-    again=0
     white = (255, 255, 255)
 
     while run1:
@@ -226,15 +255,15 @@ def main():
 
 
       while space_click:
-          p2Pos = read_pos(n.send(make_pos((p.x, p.y, crash1, ready1))))
+          p2Pos = read_pos(n.send(make_pos((p.x, p.y, crash1,count,ready1))))
           p2.x = p2Pos[0]
           p2.y = p2Pos[1]
           crash2 = p2Pos[2]
-          ready2= p2Pos[3]
+          ready2= p2Pos[4]
 
           p2.update()
 
-          if  ready2==0 and crash2==0 and crash1==0 :
+          if  ready2==0 and crash2==0 and crash1==0 and readye==0 :
               image3 = pygame.image.load(r"C:\Users\melsh\Desktop\gam3a\projectDis\img\a6rBl.png")
               scaled_image = pygame.transform.scale(image3, (10, 15))
               image_rect = scaled_image.get_rect()
@@ -249,6 +278,7 @@ def main():
               win.blit(image3, (xc, yc))
               win.blit(text1, (155 - text.get_width() // 2, 100 - text.get_height() // 3))
               pygame.display.flip()
+
 
           elif  ready2==1 and crash2==1 :
 
@@ -269,8 +299,8 @@ def main():
                             run1 = False
                         if event.key == pygame.K_SPACE:
                             pressed_key2=1
-                            again==1
-                            # ready1=0
+                            readye = 0
+
                             space_click = False
 
 
@@ -283,6 +313,7 @@ def main():
               win.blit(text, (80, 200))
               win.blit(text2, (80, 600))
               pygame.display.update()
+
               while pressed_key2 == 0:
                   for event in pygame.event.get():
                       if event.type == pygame.QUIT:
@@ -295,12 +326,14 @@ def main():
                                   crash1 = 0
                                   pressed_key2 = 1
                                   ready1=0
+                                  readye = 0
 
                                   space_click= False
           elif ready2 == 1 and crash2 == 0:
 
             p.move(win)
             redrawWindow(win, p, p2)
+            readye=1
 
 
 
