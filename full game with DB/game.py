@@ -1,5 +1,8 @@
-
-
+import threading
+import socket
+import time
+import tkinter as tk
+import winsound
 import pygame
 from network import network
 import random
@@ -8,18 +11,177 @@ from dotenv import load_dotenv , find_dotenv
 import os
 load_dotenv(find_dotenv())
 from pymongo import MongoClient
+
+# Connecting to our Database
 password = os.environ.get("MONGODB_PWD")
 connection_string=f"mongodb+srv://melshafaie123:{password}@game.czsmeor.mongodb.net/?retryWrites=true&w=majority"
 client=MongoClient(connection_string)
 db = client["game_database"]
 collection = db["game_state"]
 
+
+global client_socket
+
+#chat code
+def chat_window():
+    # Create the main window
+    root = tk.Tk()
+    root.title("Racer Chat")
+
+    # Set the window icon
+    root.iconbitmap("racer.ico")
+
+    # Create a frame to hold the chat messages
+    messages_frame = tk.Frame(root)
+    scrollbar = tk.Scrollbar(messages_frame)
+
+    # This will contain the chat messages
+    msg_list = tk.Listbox(messages_frame, height=15, width=50, yscrollcommand=scrollbar.set)
+
+    # Set the chat bubble appearance
+    msg_list.config(border=10, highlightthickness=10, relief=tk.FLAT, font=("Arial", 12), justify=tk.LEFT)
+    msg_list.config(bg="#f7f7f7", fg="#333333")
+    msg_list.config(selectbackground="#b5d5ff", selectforeground="#333333")
+
+    scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+    msg_list.pack(side=tk.LEFT, fill=tk.BOTH)
+    messages_frame.pack()
+
+    # Create a frame to hold the entry field and send button
+    entry_frame = tk.Frame(root)
+    entry_field = tk.Entry(entry_frame)
+
+    # Set the appearance of the entry field
+    entry_field.config(border=8, highlightthickness=0, relief=tk.FLAT, font=("Arial", 12))
+
+    entry_field.pack(side=tk.LEFT, expand=True, fill=tk.BOTH)
+
+    # Function to handle sending messages from the client to the server
+    def send(event=None):
+        message = entry_field.get()
+        entry_field.delete(0, tk.END)
+        client_socket.send(bytes(message, "utf8"))
+        if message == "{quit}":
+            client_socket.close()
+            root.quit()
+
+       
+
+    # Bind the send function to the Return key
+    entry_field.bind("<Return>", send)
+
+    # Create a button to send messages
+    send_button = tk.Button(entry_frame, text="Send 🏎", command=send)
+
+    # Set the appearance of the send button
+    send_button.config(border=1, highlightthickness=5, relief=tk.FLAT, font=("Arial", 12), bg="#007bff", fg="#ffffff",
+                       cursor="hand2")
+
+    send_button.pack(side=tk.RIGHT)
+
+    entry_frame.pack()
+
+    # Create a frame to hold the alias label and entry field
+    alias_frame = tk.Frame(root)
+    alias_label = tk.Label(alias_frame, text="Enter your Name:")
+    # Set the appearance of the alias label
+    alias_label.config(border=10, highlightthickness=0, relief=tk.FLAT, font=("Arial", 12), fg="#333333")
+    alias_label.pack(side=tk.LEFT)
+    alias_entry = tk.Entry(alias_frame)
+    # Set the appearance of the alias entry field
+    alias_entry.config(border=5, highlightthickness=0, relief=tk.FLAT, font=("Arial", 12))
+    alias_entry.pack(side=tk.LEFT)
+    alias_frame.pack()
+
+    # Function to get the user's alias and connect to the server
+    def connect():
+        global alias
+        alias = alias_entry.get()
+        if alias:
+            # Create a socket connection to the server
+            global client_socket
+            client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            client_socket.connect(("157.175.216.125", 50000))
+            client_socket.send(bytes(alias, "utf8"))
+            # Play a sound effect
+            winsound.PlaySound("sound/Notification.wav", winsound.SND_FILENAME)
+            # Remove the alias entry fields and connect button
+            alias_frame.pack_forget()
+            connect_button.pack_forget()
+            # Create a button to quit
+            quit_button = tk.Button(root, text="Quit 🚪", command=quit)
+            # Set the appearance of the quit button
+            quit_button.config(border=1, highlightthickness=5, relief=tk.FLAT, font=("Arial", 12), bg="#dc3545",
+                               fg="#ffffff", bd=1, activebackground="#c82333", activeforeground="#ffffff",
+                               cursor="hand2")
+
+            quit_button.pack()
+
+            # Function to handle receiving messages from the server and displaying them in the chat window
+            def receive():
+                while True:
+                    try:
+                        message = client_socket.recv(1024).decode('utf-8')
+
+                        # Determine if the message was sent by the client or received from the server
+                        if message.startswith(alias):
+                            # Format the message as sent by the client
+                            if message.endswith("connected!"): # appearance of informing connection
+                                msg_list.insert(tk.END, message)
+                                msg_list.itemconfig(tk.END, fg="blue")
+                            else:
+                                parts = message.split(':')  ## Format the message as sent by the client
+                                parts[0] = "You "
+                                message = ':'.join(parts)
+                                msg_list.insert(tk.END, message)
+                                msg_list.itemconfig(tk.END, fg="blue")
+                        else:
+                            # Format the message as received from the server
+                            msg_list.insert(tk.END, message)
+                            msg_list.itemconfig(tk.END, fg="green")
+                    except Exception as e:
+                        print('Error:', e)
+                        client_socket.close()
+                        root.quit()
+                        break
+
+            # Create a thread to handle receiving messages from the server
+            receive_thread = threading.Thread(target=receive)
+            receive_thread.start()
+
+    # Create a button to connect to the server
+    connect_button = tk.Button(root, text="Connect 🚀", command=connect)
+
+    # Set the appearance of the connect button
+    connect_button.config(border=1, highlightthickness=5, relief=tk.FLAT, font=("Arial", 12), bg="#28a745",
+                          fg="#ffffff",
+                          bd=1, activebackground="#218838", activeforeground="#ffffff", cursor="hand2")
+
+    connect_button.pack()
+
+    # Function to quit the program and close the socket connection
+    def quit():
+        client_socket.send(bytes("{quit}", "utf8"))
+        client_socket.close()
+        root.quit()
+
+    root.protocol("WM_DELETE_WINDOW", quit)
+
+    # Start the GUI event loop
+    root.mainloop()
+
+
+
+
+
 pygame.init()
 width_dis = 360
 height_dis = 650
 win = pygame.display.set_mode((width_dis, height_dis))
-pygame.display.set_caption("Client")
-vel = 1
+pygame.display.set_caption("Racing game")
+icon = pygame.image.load("img/sports-car.png")
+pygame.display.set_icon(icon)
+vel = 13
 clientNumber = 0
 ready1 = 0
 crash1=0
@@ -46,11 +208,11 @@ class Player():
         self.bg_img_x2 = (width_dis / 2) - (360 / 2)
         self.bg_img_y1 = 0
         self.bg_img_y2 = -600
-        self.bg_img_speed = 0.7
-        self.enemy_car = pygame.image.load('.\\img\\enemy_car_1.png')
+        self.bg_img_speed = 21
+        self.enemy_car = pygame.image.load(r"img/enemy_car_1.png")
         self.enemy_car_startx = random.randrange(100, 360)
         self.enemy_car_starty = -600
-        self.enemy_car_speed = 0.5
+        self.enemy_car_speed = 15
         self.enemy_car_width = 49
         self.enemy_car_height = 100
 
@@ -111,8 +273,8 @@ class Player():
 
         count += 1
         if (count % 10000 == 0):
-            self.enemy_car_speed += 0.05
-            self.bg_img_speed += 0.05
+            self.enemy_car_speed += 10
+            self.bg_img_speed += 10
 
         if self.enemy_car_starty + self.enemy_car_height > self.y + 25 and self.enemy_car_starty < self.y + self.height - 25:
             if self.x + 25 > self.enemy_car_startx and self.x + 25 < self.enemy_car_startx + self.enemy_car_width:
@@ -124,8 +286,8 @@ class Player():
                 self.y = 550
                 self.enemy_car_starty = -600
                 self.enemy_car_startx = random.randrange(100, 300)
-                self.enemy_car_speed = 0.5
-                self.bg_img_speed = 0.7
+                self.enemy_car_speed = 15
+                self.bg_img_speed = 21
                 count = 0
         if self.x < 20 or self.x > 300:
                 self.crashed = True
@@ -150,8 +312,8 @@ class Player():
         self.y = self.yin
         self.enemy_car_starty = -600
         self.enemy_car_startx = random.randrange(100, 300)
-        self.enemy_car_speed = 0.5
-        self.bg_img_speed = 0.7
+        self.enemy_car_speed = 15
+        self.bg_img_speed = 21
         count = 0
 
         # Pause the game until the player chooses to play again
@@ -191,20 +353,21 @@ game_state_structure = {
     ]
 }
 
-
+chat_playing = True  # flag to control entering chat while playing
 def main():
     global crash2
     global crash1
     global run1
     global ready1
     global count
+    global chat_playing
     readye=0
 
 
     n = network()
-    car_image = r"C:\Users\melsh\Desktop\gam3a\projectDis\img\car.png"
-    car_image2 = r"C:\Users\melsh\Desktop\gam3a\projectDis\img\enemy_car_2.png"
-    bg_img = pygame.image.load(r"C:\Users\melsh\Desktop\gam3a\projectDis\img\White-broken-lines.png")
+    car_image = r"img/car.png"
+    car_image2 = r"img/enemy_car_2.png"
+    bg_img = pygame.image.load(r"img/White-broken-lines.png")
     scaled_image = pygame.transform.scale(bg_img, (360, 650))
     game_state = collection.find_one({"game_id": "my_game"})
     if game_state:
@@ -224,24 +387,16 @@ def main():
     space_click=0
     xc = 0
     yc = height_dis  // 2
-    vel_x = 1.5
+    vel_x = 15
     vel_y = 0
     white = (255, 255, 255)
 
     while run1:
       pressed_key2 = 0
       clock.tick(100)
-      win.fill((202, 228, 241))
-      font = pygame.font.SysFont("Montserrat", 30)
-      text = font.render("Press Space to play!", 1, white)
-      text2 = font.render("Press Escape to exit!", 1, white)
-      text3 = font.render("Press c to chat", 1, white)
-      bg_image5 = pygame.image.load(r"C:\Users\melsh\Desktop\gam3a\projectDis\img\DiRT-5-Vide-Game-Race-4K-Ultra-HD-Mobile-Wallpaper-scaled.jpg")
+      bg_image5 = pygame.image.load(r"img/Game lobby.png")
       bg_image5 = pygame.transform.scale(bg_image5, (width_dis, height_dis))
       win.blit(bg_image5, (0, 0))
-      win.blit(text, (width_dis / 2 - text.get_width() / 2, 100))
-      win.blit(text2, (width_dis / 2 - text2.get_width() / 2, 500))
-      win.blit(text3, (width_dis / 2 - text3.get_width() / 2, 200))
 
       pygame.display.update()
       for event in pygame.event.get():
@@ -252,9 +407,17 @@ def main():
                  run1 = False
            if event.key == pygame.K_SPACE:
                space_click=1
+           if event.key == pygame.K_c:
+               chat_thread = threading.Thread(target=chat_window)
+               chat_thread.start()
 
 
       while space_click:
+          keys = pygame.key.get_pressed()
+          if keys[pygame.K_c] and chat_playing == True:
+              time.sleep(0.5)  # handling debounce delay of pressing 'c'
+              chat_thread = threading.Thread(target=chat_window)
+              chat_thread.start()
           p2Pos = read_pos(n.send(make_pos((p.x, p.y, crash1,count,ready1))))
           p2.x = p2Pos[0]
           p2.y = p2Pos[1]
@@ -264,7 +427,7 @@ def main():
           p2.update()
 
           if  ready2==0 and crash2==0 and crash1==0 and readye==0 :
-              image3 = pygame.image.load(r"C:\Users\melsh\Desktop\gam3a\projectDis\img\a6rBl.png")
+              image3 = pygame.image.load(r"img/loading.png")
               scaled_image = pygame.transform.scale(image3, (10, 15))
               image_rect = scaled_image.get_rect()
               font = pygame.font.SysFont("comicsansms", 20, True)
@@ -276,12 +439,12 @@ def main():
 
               win.fill((135, 206, 250))
               win.blit(image3, (xc, yc))
-              win.blit(text1, (155 - text.get_width() // 2, 100 - text.get_height() // 3))
+              win.blit(text1, (155 - text1.get_width() // 2, 100 - text1.get_height() // 3))
               pygame.display.flip()
 
 
           elif  ready2==1 and crash2==1 :
-
+                chat_playing = False
                 p.display_message("you win!!", win)
                 win.fill((202, 228, 241))
                 font = pygame.font.SysFont("comicsans", 20)
@@ -298,14 +461,20 @@ def main():
                         if event.key == pygame.K_ESCAPE:
                             run1 = False
                         if event.key == pygame.K_SPACE:
+                            chat_playing = True
+
                             pressed_key2=1
                             readye = 0
 
                             space_click = False
+                        if event.key == pygame.K_c:
+                            chat_thread = threading.Thread(target=chat_window)
+                            chat_thread.start()
 
 
 
           elif ready2==1 and  crash1==1 :
+              chat_playing = False
               win.fill((202, 228, 241))
               font = pygame.font.SysFont("comicsans", 20)
               text = font.render("Press Space to play again!", 1, (58, 78, 91))
@@ -322,13 +491,15 @@ def main():
                           if event.key == pygame.K_ESCAPE:
                               run1 = False
                           if event.key == pygame.K_SPACE:
-
+                                  chat_playing = True
                                   crash1 = 0
                                   pressed_key2 = 1
                                   ready1=0
                                   readye = 0
-
                                   space_click= False
+                          if event.key == pygame.K_c:
+                              chat_thread = threading.Thread(target=chat_window)
+                              chat_thread.start()
           elif ready2 == 1 and crash2 == 0:
 
             p.move(win)
