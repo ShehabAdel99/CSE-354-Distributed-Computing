@@ -9,7 +9,7 @@ from pymongo import MongoClient
 
 
 password = os.environ.get("MONGODB_PWD")
-connection_string=f"mongodb+srv://Shehab_Adel_:{password}@cluster0.euh8kxv.mongodb.net/?retryWrites=true&w=majority"
+connection_string=f"mongodb+srv://melshafaie123:{password}@game.czsmeor.mongodb.net/?retryWrites=true&w=majority"
 client=MongoClient(connection_string)
 server="157.175.216.125"
 port=5555
