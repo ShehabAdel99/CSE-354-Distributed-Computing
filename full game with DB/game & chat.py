@@ -11,8 +11,6 @@ from dotenv import load_dotenv , find_dotenv
 import os
 load_dotenv(find_dotenv())
 from pymongo import MongoClient
-from pygame.locals import *
-
 password = os.environ.get("MONGODB_PWD")
 connection_string=f"mongodb+srv://melshafaie123:{password}@game.czsmeor.mongodb.net/?retryWrites=true&w=majority"
 client=MongoClient(connection_string)
@@ -106,7 +104,7 @@ def chat_window():
             # Create a socket connection to the server
             global client_socket
             client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            client_socket.connect(('192.168.1.74', 50000))
+            client_socket.connect(("192.168.1.9", 50000))
             client_socket.send(bytes(alias, "utf8"))
             # Play a revving engine sound effect
             winsound.PlaySound("engine_sound.wav", winsound.SND_FILENAME)
@@ -177,13 +175,16 @@ def chat_window():
     root.mainloop()
 
 
-#game code
+
+
 
 pygame.init()
 width_dis = 360
 height_dis = 650
 win = pygame.display.set_mode((width_dis, height_dis))
-pygame.display.set_caption("Client")
+pygame.display.set_caption("Racing game")
+icon = pygame.image.load("sports-car.png")
+pygame.display.set_icon(icon)
 vel = 1
 clientNumber = 0
 ready1 = 0
@@ -212,7 +213,7 @@ class Player():
         self.bg_img_y1 = 0
         self.bg_img_y2 = -600
         self.bg_img_speed = 0.7
-        self.enemy_car = pygame.image.load('.\\img\\enemy_car_1.png')
+        self.enemy_car = pygame.image.load(r"C:\Users\melsh\Desktop\gam3a\projectDis - Copy\img\enemy_car_1.png")
         self.enemy_car_startx = random.randrange(100, 360)
         self.enemy_car_starty = -600
         self.enemy_car_speed = 0.5
@@ -356,10 +357,7 @@ game_state_structure = {
     ]
 }
 
-
-
 chat_playing = True  # flag to control entering chat while playing
-
 def main():
     global crash2
     global crash1
@@ -367,99 +365,89 @@ def main():
     global ready1
     global count
     global chat_playing
+    readye=0
 
-    readye = 0
 
     n = network()
-    car_image = r"D:\Lectures\Senior-1\Semester 8\Distributed\pythonProject\projectDis\img\car.png"
-    car_image2 = r"D:\Lectures\Senior-1\Semester 8\Distributed\pythonProject\projectDis\img\enemy_car_2.png"
-    bg_img = pygame.image.load(r"D:\Lectures\Senior-1\Semester 8\Distributed\pythonProject\projectDis\img\White-broken-lines.png")
+    car_image = r"C:\Users\melsh\Desktop\gam3a\projectDis - Copy\img\car.png"
+    car_image2 = r"C:\Users\melsh\Desktop\gam3a\projectDis - Copy\img\enemy_car_2.png"
+    bg_img = pygame.image.load(r"C:\Users\melsh\Desktop\gam3a\projectDis - Copy\img\White-broken-lines.png")
     scaled_image = pygame.transform.scale(bg_img, (360, 650))
     game_state = collection.find_one({"game_id": "my_game"})
     if game_state:
-        if game_state["discar"] == 1:
-            p = Player(game_state["pos"][1][0], game_state["pos"][1][1], 49, 100, car_image2, scaled_image)
-            count = game_state["pos"][1][3]
-            p2 = Player(game_state["pos"][0][0], game_state["pos"][0][1], 49, 100, car_image, scaled_image)
-        else:
-            p = Player(game_state["pos"][0][0], game_state["pos"][0][1], 49, 100, car_image2, scaled_image)
-            count = game_state["pos"][0][3]
-            p2 = Player(game_state["pos"][1][0], game_state["pos"][1][1], 49, 100, car_image, scaled_image)
+     if game_state["discar"]==1:
+      p = Player(game_state["pos"][1][0], game_state["pos"][1][1], 49, 100, car_image2, scaled_image)
+      count=game_state["pos"][1][3]
+      p2 = Player(game_state["pos"][0][0], game_state["pos"][0][1], 49, 100, car_image, scaled_image)
+     else:
+      p = Player(game_state["pos"][0][0], game_state["pos"][0][1], 49, 100, car_image2, scaled_image)
+      count = game_state["pos"][0][3]
+      p2 = Player(game_state["pos"][1][0], game_state["pos"][1][1], 49, 100, car_image, scaled_image)
 
     else:
-        p = Player(150, 500, 49, 100, car_image2, scaled_image)
-        p2 = Player(150, 500, 49, 100, car_image, scaled_image)
-    clock = pygame.time.Clock()
-    space_click = 0
+     p = Player(150, 500, 49, 100, car_image2, scaled_image)
+     p2 = Player(150,500, 49, 100, car_image, scaled_image)
+    clock=pygame.time.Clock()
+    space_click=0
     xc = 0
-    yc = height_dis // 2
+    yc = height_dis  // 2
     vel_x = 1.5
     vel_y = 0
     white = (255, 255, 255)
 
     while run1:
-        pressed_key2 = 0
-        clock.tick(100)
-        win.fill((202, 228, 241))
-        font = pygame.font.SysFont("Montserrat", 30)
-        text = font.render("Press Space to play!", 1, white)
-        text2 = font.render("Press Escape to exit!", 1, white)
-        text3 = font.render("Press c to chat", 1, white)
-        bg_image5 = pygame.image.load(
-            r"D:\Lectures\Senior-1\Semester 8\Distributed\pythonProject\projectDis\Wallpaper.jpg")
-        bg_image5 = pygame.transform.scale(bg_image5, (width_dis, height_dis))
-        win.blit(bg_image5, (0, 0))
-        win.blit(text, (width_dis / 2 - text.get_width() / 2, 100))
-        win.blit(text2, (width_dis / 2 - text2.get_width() / 2, 500))
-        win.blit(text3, (width_dis / 2 - text3.get_width() / 2, 200))
+      pressed_key2 = 0
+      clock.tick(100)
+      bg_image5 = pygame.image.load(r"C:\Users\melsh\Desktop\gam3a\projectDis - Copy\img\amr-02.jpg")
+      bg_image5 = pygame.transform.scale(bg_image5, (width_dis, height_dis))
+      win.blit(bg_image5, (0, 0))
 
-        pygame.display.update()
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                run1 = False
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    run1 = False
-                if event.key == pygame.K_SPACE:
-                    space_click = 1
-                if event.key == pygame.K_c:
-                    chat_thread = threading.Thread(target=chat_window)
-                    chat_thread.start()
-
-        while space_click:
-
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_c] and chat_playing == True:
-                time.sleep(0.5)  # handling debounce delay of pressing 'c'
-                chat_thread = threading.Thread(target=chat_window)
-                chat_thread.start()
-
-            p2Pos = read_pos(n.send(make_pos((p.x, p.y, crash1, count, ready1))))
-            p2.x = p2Pos[0]
-            p2.y = p2Pos[1]
-            crash2 = p2Pos[2]
-            ready2 = p2Pos[4]
-
-            p2.update()
-
-            if ready2 == 0 and crash2 == 0 and crash1 == 0 and readye == 0:
-                image3 = pygame.image.load(r"D:\Lectures\Senior-1\Semester 8\Distributed\pythonProject\projectDis\img\a6rBl.png")
-                scaled_image = pygame.transform.scale(image3, (10, 15))
-                image_rect = scaled_image.get_rect()
-                font = pygame.font.SysFont("comicsansms", 20, True)
-                text1 = font.render("waiting for other player", True, white)
-                xc += vel_x
-                yc += vel_y
-                if xc > width_dis:
-                    xc = -image_rect.width
-
-                win.fill((135, 206, 250))
-                win.blit(image3, (xc, yc))
-                win.blit(text1, (155 - text.get_width() // 2, 100 - text.get_height() // 3))
-                pygame.display.flip()
+      pygame.display.update()
+      for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+             run1 = False
+        if event.type == pygame.KEYDOWN:
+           if event.key == pygame.K_ESCAPE:
+                 run1 = False
+           if event.key == pygame.K_SPACE:
+               space_click=1
+           if event.key == pygame.K_c:
+               chat_thread = threading.Thread(target=chat_window)
+               chat_thread.start()
 
 
-            elif ready2 == 1 and crash2 == 1:
+      while space_click:
+          keys = pygame.key.get_pressed()
+          if keys[pygame.K_c] and chat_playing == True:
+              time.sleep(0.5)  # handling debounce delay of pressing 'c'
+              chat_thread = threading.Thread(target=chat_window)
+              chat_thread.start()
+          p2Pos = read_pos(n.send(make_pos((p.x, p.y, crash1,count,ready1))))
+          p2.x = p2Pos[0]
+          p2.y = p2Pos[1]
+          crash2 = p2Pos[2]
+          ready2= p2Pos[4]
+
+          p2.update()
+
+          if  ready2==0 and crash2==0 and crash1==0 and readye==0 :
+              image3 = pygame.image.load(r"C:\Users\melsh\Desktop\gam3a\projectDis - Copy\img\a6rBl.png")
+              scaled_image = pygame.transform.scale(image3, (10, 15))
+              image_rect = scaled_image.get_rect()
+              font = pygame.font.SysFont("comicsansms", 20, True)
+              text1 = font.render("waiting for other player", True, white)
+              xc += vel_x
+              yc+= vel_y
+              if xc > width_dis:
+                  xc = -image_rect.width
+
+              win.fill((135, 206, 250))
+              win.blit(image3, (xc, yc))
+              win.blit(text1, (155 - text.get_width() // 2, 100 - text.get_height() // 3))
+              pygame.display.flip()
+
+
+          elif  ready2==1 and crash2==1 :
                 chat_playing = False
                 p.display_message("you win!!", win)
                 win.fill((202, 228, 241))
@@ -469,66 +457,70 @@ def main():
                 win.blit(text, (80, 200))
                 win.blit(text2, (80, 600))
                 pygame.display.update()
-                while pressed_key2 == 0:
-                    for event in pygame.event.get():
-                        if event.type == pygame.QUIT:
+                while pressed_key2==0 :
+                 for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        run1 = False
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_ESCAPE:
                             run1 = False
-                        if event.type == pygame.KEYDOWN:
-                            if event.key == pygame.K_ESCAPE:
-                                run1 = False
-                            if event.key == pygame.K_SPACE:
-                                chat_playing = True
-                                pressed_key2 = 1
-                                readye = 0
+                        if event.key == pygame.K_SPACE:
+                            chat_playing = True
 
-                                space_click = False
+                            pressed_key2=1
+                            readye = 0
 
-                            if event.key == pygame.K_c:
-                                chat_thread = threading.Thread(target=chat_window)
-                                chat_thread.start()
+                            space_click = False
+                        if event.key == pygame.K_c:
+                            chat_thread = threading.Thread(target=chat_window)
+                            chat_thread.start()
 
 
 
-            elif ready2 == 1 and crash1 == 1:
-                chat_playing = False
-                win.fill((202, 228, 241))
-                font = pygame.font.SysFont("comicsans", 20)
-                text = font.render("Press Space to play again!", 1, (58, 78, 91))
-                text2 = font.render("Press Escape to exit!", 1, (58, 78, 91))
-                win.blit(text, (80, 200))
-                win.blit(text2, (80, 600))
-                pygame.display.update()
+          elif ready2==1 and  crash1==1 :
+              chat_playing = False
+              win.fill((202, 228, 241))
+              font = pygame.font.SysFont("comicsans", 20)
+              text = font.render("Press Space to play again!", 1, (58, 78, 91))
+              text2 = font.render("Press Escape to exit!", 1, (58, 78, 91))
+              win.blit(text, (80, 200))
+              win.blit(text2, (80, 600))
+              pygame.display.update()
 
-                while pressed_key2 == 0:
-                    for event in pygame.event.get():
-                        if event.type == pygame.QUIT:
-                            run1 = False
-                        if event.type == pygame.KEYDOWN:
-                            if event.key == pygame.K_ESCAPE:
-                                run1 = False
-                            if event.key == pygame.K_SPACE:
-                                chat_playing = True
-                                crash1 = 0
-                                pressed_key2 = 1
-                                ready1 = 0
-                                readye = 0
+              while pressed_key2 == 0:
+                  for event in pygame.event.get():
+                      if event.type == pygame.QUIT:
+                          run1 = False
+                      if event.type == pygame.KEYDOWN:
+                          if event.key == pygame.K_ESCAPE:
+                              run1 = False
+                          if event.key == pygame.K_SPACE:
+                                  chat_playing = True
+                                  crash1 = 0
+                                  pressed_key2 = 1
+                                  ready1=0
+                                  readye = 0
+                                  space_click= False
+                          if event.key == pygame.K_c:
+                              chat_thread = threading.Thread(target=chat_window)
+                              chat_thread.start()
+          elif ready2 == 1 and crash2 == 0:
 
-                                space_click = False
+            p.move(win)
+            redrawWindow(win, p, p2)
+            readye=1
 
-                            if event.key == pygame.K_c:
-                                chat_thread = threading.Thread(target=chat_window)
-                                chat_thread.start()
 
-            elif ready2 == 1 and crash2 == 0:
 
-                p.move(win)
-                redrawWindow(win, p, p2)
-                readye = 1
 
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    space_click = 0
-                    run1 = False
 
-if __name__ == "__main__":
-    main()
+          for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                space_click=0
+                run1 = False
+
+
+
+
+
+main()
