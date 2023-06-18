@@ -48,12 +48,19 @@ The race continues until one of the players reaches the finish line, and the win
 # Important Note 📝
 Make sure that you connect the your instance, you can use ubuntu linux virtual machine 
 # Included Libraries 📚
-import threading
-import socket
-import time
-import tkinter 
-import winsound
-import pygame
-import random
-from time import sleep
+
+<ul>
+  <li>import pygame</li>
+  <li>import threading</li>
+  <li>import socket</li>
+  <li>import time</li>
+  <li>import tkinter</li>
+  <li>import winsound</li>
+  <li>import random</li>
+  <li>from time import sleep</li>
+ 
+</ul>
+
+
+
 # Have Fun! 🚀
