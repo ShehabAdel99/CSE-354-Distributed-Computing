@@ -171,7 +171,16 @@ def chat_window():
     root.mainloop()
 
 
+#game code 
 
+# initialize pygame mixer module
+pygame.mixer.init()
+
+# load the lobby and gameplay background music files
+pygame.mixer.music.load('sound/gameplay_music.mp3')
+
+# play the lobby background music
+pygame.mixer.music.play(-1)
 
 
 pygame.init()
