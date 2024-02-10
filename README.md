@@ -1,5 +1,5 @@
 
-# Car-Racer 🚗 -Distributed-Computing-Project 
+# Car-Racer 🚗
 
 Car-Racer is an exhilarating distributed computing project developed using Python's Pygame library. This high-speed racing game pits players against each other in a race to achieve the highest score while dodging obstacles and rival drivers. Featuring real-time communication via a built-in chat room, Car-Racer delivers an immersive gaming experience that transcends geographical boundaries.
 
