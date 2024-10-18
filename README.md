@@ -80,7 +80,7 @@ Make sure that you connect the your instance, you can use ubuntu linux virtual m
 Car-Racer showcases the power of Pygame, Python, distributed computing, and cloud services in game development. Its immersive gameplay, real-time communication, and database integration make it a standout project in the gaming community. Whether you're a player looking for thrilling racing action or a developer seeking insights into game development, Car-Racer has something to offer for everyone.
 
 ## Authors
-- Shehab Adel Ramadan
+- Shehab Adel Ramadan Moharram
 - Amr Essam Kamal El-din
 - Omar Salah Abdelkader
 - Mohamed Reda Mohamed
